@@ -15,6 +15,7 @@ import mimetypes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from super_quneo_collider.audio import route_audio
 from super_quneo_collider.map import load_mapping, scale_cc
 from super_quneo_collider.midi import MidiWatcher
 from super_quneo_collider.sc import ScServer
@@ -24,16 +25,19 @@ _DEFAULT_CLIENT_DIR = Path(__file__).resolve().parent.parent.parent / "client"
 
 
 class ColliderApp:
-    def __init__(self, mapping, midi, sc, node=1000):
+    def __init__(self, mapping, midi, sc, node=1000, router=route_audio):
         self.mapping = mapping
         self.midi = midi
         self.sc = sc
         self.node = int(node)
+        self.router = router
         self.sliders: dict[str, float] = {}
 
     def start(self) -> None:
         self.sc.boot()
         self.sc.load_bubbles()
+        # link scsynth's audio into the default sink (best effort)
+        self.router()
         # spawn an initial bubble so the synth is audible on load
         self.sc.spawn_bubbles(self.node)
         self.midi.start()

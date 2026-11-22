@@ -52,9 +52,13 @@ class FakeSc:
         self.sets.append((node, param, value))
 
 
-def make_app():
+def make_app(router=None):
     return ColliderApp(
-        mapping=load_mapping(MAPPING), midi=FakeMidi(), sc=FakeSc(), node=1000
+        mapping=load_mapping(MAPPING),
+        midi=FakeMidi(),
+        sc=FakeSc(),
+        node=1000,
+        router=router if router is not None else (lambda: []),
     )
 
 
@@ -97,6 +101,13 @@ def test_start_boots_and_spawns():
     assert app.sc.booted and app.sc.loaded
     # one initial bubble so the synth is audible on load
     assert (1000, {}) in app.sc.spawns
+
+
+def test_start_routes_audio():
+    calls = []
+    app = make_app(router=lambda: calls.append("route"))
+    app.start()
+    assert calls == ["route"]
 
 
 @contextlib.contextmanager
