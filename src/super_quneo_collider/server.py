@@ -34,6 +34,7 @@ class ColliderApp:
     def start(self) -> None:
         self.sc.boot()
         self.sc.load_bubbles()
+        # spawn an initial bubble so the synth is audible on load
         self.sc.spawn_bubbles(self.node)
         self.midi.start()
 
@@ -43,7 +44,13 @@ class ColliderApp:
             return
         param, value = r
         self.sliders[param] = value
-        self.sc.set_param(self.node, param, value)
+        self._trigger()
+
+    def _trigger(self) -> None:
+        # Activity is the trigger: spawn a fresh bubble carrying the accumulated
+        # slider state.  Each bubble is a transient that self-frees, so a new
+        # node is used per trigger (scsynth auto-assigns on node -1).
+        self.sc.spawn_bubbles(-1, **self.sliders)
 
     def status(self) -> dict:
         return {

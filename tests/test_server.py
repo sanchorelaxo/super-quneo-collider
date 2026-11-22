@@ -33,6 +33,7 @@ class FakeSc:
         self.booted = False
         self.loaded = False
         self.spawned = None
+        self.spawns = []
 
     def boot(self):
         self.booted = True
@@ -42,8 +43,9 @@ class FakeSc:
         self.loaded = True
         return True
 
-    def spawn_bubbles(self, node):
+    def spawn_bubbles(self, node, **args):
         self.spawned = node
+        self.spawns.append((node, dict(args)))
         return True
 
     def set_param(self, node, param, value):
@@ -62,34 +64,39 @@ def test_status_shape():
     assert isinstance(st["sliders"], dict)
 
 
-def test_on_cc_scales_and_sets_param():
+def test_on_cc_triggers_bubble_with_value():
     app = make_app()
     app.on_cc(61, 127)
     assert app.status()["sliders"]["wobble"] == 10.0
-    assert (1000, "wobble", 10.0) in app.sc.sets
+    # activity spawns a fresh bubble carrying the current value
+    assert any(args.get("wobble") == 10.0 for _node, args in app.sc.spawns)
 
 
 def test_on_cc_unbound_ignored():
     app = make_app()
     app.on_cc(85, 64)
     assert app.status()["sliders"] == {}
-    assert app.sc.sets == []
+    assert app.sc.spawns == []
 
 
-def test_three_sliders_independent():
+def test_on_cc_accumulates_params_into_trigger():
     app = make_app()
     app.on_cc(61, 63)
     app.on_cc(69, 64)
     assert app.status()["sliders"]["wobble"] == 4.961
     assert app.status()["sliders"]["innerWobble"] == 8.063
-    assert (1000, "wobble", 4.961) in app.sc.sets
-    assert (1000, "innerWobble", 8.063) in app.sc.sets
+    # the latest triggered bubble carries the accumulated slider state
+    _node, args = app.sc.spawns[-1]
+    assert args["wobble"] == 4.961
+    assert args["innerWobble"] == 8.063
 
 
 def test_start_boots_and_spawns():
     app = make_app()
     app.start()
-    assert app.sc.booted and app.sc.loaded and app.sc.spawned == 1000
+    assert app.sc.booted and app.sc.loaded
+    # one initial bubble so the synth is audible on load
+    assert (1000, {}) in app.sc.spawns
 
 
 @contextlib.contextmanager

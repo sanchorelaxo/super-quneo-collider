@@ -171,8 +171,12 @@ class ScServer:
             time.sleep(0.1)
         return False
 
-    def spawn_bubbles(self, node: int = 1000) -> bool:
-        self._send("/s_new", "bubbles", int(node), 0, 0)
+    def spawn_bubbles(self, node: int = 1000, **args) -> bool:
+        flat = ["/s_new", "bubbles", int(node), 0, 0]
+        for key, value in args.items():
+            flat.append(str(key))
+            flat.append(float(value))
+        self._send(*flat)
         return True
 
     def set_param(self, node: int, param: str, value: float) -> None:
