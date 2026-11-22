@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>collider client tests</title>
+<style>
+  body { font: 14px/1.5 monospace; background: #101014; color: #d8d8e0; padding: 1rem; }
+  li.ok { color: #7dd67d; }
+  li.bad { color: #ff7b72; }
+  ul { list-style: none; padding: 0; }
+</style>
+</head>
+<body>
+<h1>collider tests</h1>
+<ul id="out">running...</ul>
+<script type="module">
+import { runAll } from './harness.js';
+import './board.test.js';
+
+const results = await runAll();
+const out = document.getElementById('out');
+out.textContent = '';
+for (const r of results) {
+  const li = document.createElement('li');
+  li.className = r.ok ? 'ok' : 'bad';
+  li.textContent = `${r.ok ? 'PASS' : 'FAIL'} ${r.name}${r.error ? ' — ' + r.error : ''}`;
+  out.append(li);
+}
+window.__TESTS_DONE__ = true;
+</script>
+</body>
+</html>

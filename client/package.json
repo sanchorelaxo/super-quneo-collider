@@ -1,0 +1,6 @@
+{
+  "name": "super-quneo-collider-client",
+  "private": true,
+  "type": "module",
+  "description": "Static three.js collider board for super-quneo-collider (no build step, no dependencies)."
+}

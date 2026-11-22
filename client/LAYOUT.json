@@ -1,0 +1,71 @@
+{
+  "units": "mm",
+  "channel": 15,
+  "board": {
+    "w": 241.0,
+    "h": 185.0,
+    "thickness": 9.5,
+    "corner_radius": 6.0,
+    "origin": "top-left of board footprint, x right, y down (front of board)"
+  },
+  "source": "collider board — 4 vertical sliders (geometry from queneo-editor LAYOUT.json, MIDI params mirror mapping.json)",
+  "controls": [
+    {
+      "id": "vSliderButton0",
+      "kind": "vslider",
+      "shape": "pill_track",
+      "cx_mm": 19.2,
+      "cy_mm": 151.8,
+      "w_mm": 11.9,
+      "h_mm": 48.0,
+      "noteNum": 20,
+      "pressCC": 60,
+      "locCC": 61,
+      "param": "wobble",
+      "min": 0.0,
+      "max": 10.0
+    },
+    {
+      "id": "vSliderButton1",
+      "kind": "vslider",
+      "shape": "pill_track",
+      "cx_mm": 38.0,
+      "cy_mm": 151.8,
+      "w_mm": 11.9,
+      "h_mm": 48.0,
+      "noteNum": 24,
+      "pressCC": 68,
+      "locCC": 69,
+      "param": "innerWobble",
+      "min": 0.0,
+      "max": 16.0
+    },
+    {
+      "id": "vSliderButton2",
+      "kind": "vslider",
+      "shape": "pill_track",
+      "cx_mm": 56.9,
+      "cy_mm": 151.8,
+      "w_mm": 11.9,
+      "h_mm": 48.0,
+      "noteNum": 28,
+      "pressCC": 76,
+      "locCC": 77,
+      "param": "releaseTime",
+      "min": 2.0,
+      "max": 6.0
+    },
+    {
+      "id": "vSliderButton3",
+      "kind": "vslider",
+      "shape": "pill_track",
+      "cx_mm": 75.7,
+      "cy_mm": 151.8,
+      "w_mm": 11.9,
+      "h_mm": 48.0,
+      "noteNum": 32,
+      "pressCC": 84,
+      "locCC": 85
+    }
+  ]
+}
