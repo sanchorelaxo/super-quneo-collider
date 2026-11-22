@@ -1,7 +1,11 @@
 from pathlib import Path
 
+import contextlib
+import threading
+from http.client import HTTPConnection
+
 from super_quneo_collider.map import load_mapping
-from super_quneo_collider.server import ColliderApp
+from super_quneo_collider.server import ColliderApp, _build_server
 
 MAPPING = (
     Path(__file__).resolve().parent.parent
@@ -86,3 +90,55 @@ def test_start_boots_and_spawns():
     app = make_app()
     app.start()
     assert app.sc.booted and app.sc.loaded and app.sc.spawned == 1000
+
+
+@contextlib.contextmanager
+def running_server():
+    app = make_app()
+    server = _build_server(app, "127.0.0.1", 0)
+    port = server.server_address[1]
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield port
+    finally:
+        server.shutdown()
+        thread.join(timeout=2)
+
+
+def _get(port, path):
+    conn = HTTPConnection("127.0.0.1", port, timeout=3)
+    try:
+        conn.request("GET", path)
+        resp = conn.getresponse()
+        return resp.status, resp.getheader("Content-Type"), resp.read()
+    finally:
+        conn.close()
+
+
+def test_api_collider_content_type():
+    with running_server() as port:
+        status, ctype, _body = _get(port, "/api/collider")
+        assert status == 200
+        assert ctype == "application/json"
+
+
+def test_static_js_content_type():
+    with running_server() as port:
+        status, ctype, _body = _get(port, "/src/board.js")
+        assert status == 200
+        assert ctype == "text/javascript"
+
+
+def test_static_json_content_type():
+    with running_server() as port:
+        status, ctype, _body = _get(port, "/LAYOUT.json")
+        assert status == 200
+        assert ctype == "application/json"
+
+
+def test_static_html_content_type():
+    with running_server() as port:
+        status, ctype, _body = _get(port, "/index.html")
+        assert status == 200
+        assert ctype == "text/html"

@@ -11,6 +11,7 @@ boots the app, wires the watcher's ``on_event`` to ``on_cc``, and serves
 from __future__ import annotations
 
 import json
+import mimetypes
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -79,7 +80,12 @@ def serve(config=None) -> None:
         app.midi.stop()
 
 
-def _serve_http(app: ColliderApp, host: str, port: int) -> None:
+def _guess_type(path: str) -> str:
+    ctype, _ = mimetypes.guess_type(path)
+    return ctype or "application/octet-stream"
+
+
+def _make_handler(app: ColliderApp, client_dir: Path):
     class Handler(BaseHTTPRequestHandler):
         def do_GET(self):  # noqa: N802 (BaseHTTPRequestHandler naming)
             if self.path == "/api/collider":
@@ -94,16 +100,17 @@ def _serve_http(app: ColliderApp, host: str, port: int) -> None:
                 self._serve_static()
 
         def _serve_static(self):
-            if not _DEFAULT_CLIENT_DIR.is_dir():
+            if not client_dir.is_dir():
                 self.send_error(404)
                 return
             rel = self.path.lstrip("/") or "index.html"
-            target = (_DEFAULT_CLIENT_DIR / rel).resolve()
-            if not str(target).startswith(str(_DEFAULT_CLIENT_DIR.resolve())) or not target.is_file():
+            target = (client_dir / rel).resolve()
+            if not str(target).startswith(str(client_dir.resolve())) or not target.is_file():
                 self.send_error(404)
                 return
             data = target.read_bytes()
             self.send_response(200)
+            self.send_header("Content-Type", _guess_type(rel))
             self.send_header("Content-Length", str(len(data)))
             self.end_headers()
             self.wfile.write(data)
@@ -111,7 +118,21 @@ def _serve_http(app: ColliderApp, host: str, port: int) -> None:
         def log_message(self, format, *args):  # keep stdout quiet
             pass
 
-    server = ThreadingHTTPServer((host, port), Handler)
+    return Handler
+
+
+def _build_server(
+    app: ColliderApp,
+    host: str,
+    port: int,
+    client_dir: Path | None = None,
+) -> ThreadingHTTPServer:
+    client_dir = Path(client_dir) if client_dir else _DEFAULT_CLIENT_DIR
+    return ThreadingHTTPServer((host, port), _make_handler(app, client_dir))
+
+
+def _serve_http(app: ColliderApp, host: str, port: int) -> None:
+    server = _build_server(app, host, port)
     try:
         server.serve_forever()
     except KeyboardInterrupt:
