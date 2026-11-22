@@ -1,0 +1,9 @@
+{
+  "channel": 15,
+  "controls": {
+    "vSliderButton0": {"noteNum": 20, "pressCC": 60, "locCC": 61, "param": "wobble", "min": 0.0, "max": 10.0},
+    "vSliderButton1": {"noteNum": 24, "pressCC": 68, "locCC": 69, "param": "innerWobble", "min": 0.0, "max": 16.0},
+    "vSliderButton2": {"noteNum": 28, "pressCC": 76, "locCC": 77, "param": "releaseTime", "min": 2.0, "max": 6.0},
+    "vSliderButton3": {"noteNum": 32, "pressCC": 84, "locCC": 85}
+  }
+}
