@@ -72,7 +72,11 @@ def serve(config=None) -> None:
     app = ColliderApp(mapping=mapping, midi=midi, sc=sc, node=node)
     app.start()
 
-    _serve_http(app, host, http_port)
+    try:
+        _serve_http(app, host, http_port)
+    finally:
+        app.sc.stop()
+        app.midi.stop()
 
 
 def _serve_http(app: ColliderApp, host: str, port: int) -> None:
