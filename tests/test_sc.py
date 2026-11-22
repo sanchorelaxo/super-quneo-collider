@@ -82,12 +82,45 @@ class RecordingSpawn:
 
 def test_load_bubbles_terminates_clean():
     # Inject a fake spawn that asserts the argv is positional-file (not stdin),
-    # returns exit 0; load_bubbles must wait() and return True.
+    # returns exit 0, and a probe that confirms the def registered; load_bubbles
+    # must wait() on sclang and then confirm delivery before returning True.
     calls = []
-    s = ScServer(spawn=RecordingSpawn(calls), def_script="/tmp/bubbles.scd")
+    s = ScServer(
+        spawn=RecordingSpawn(calls),
+        def_script="/tmp/bubbles.scd",
+        probe=lambda *a, **k: {"numDefs": 1},
+    )
     assert s.load_bubbles() is True
     argv = calls[0]
     assert "/tmp/bubbles.scd" in argv and "0.exit" not in argv
+
+
+def test_load_bubbles_confirms_def_via_status():
+    # load_bubbles must NOT return True merely because sclang exited 0; it must
+    # poll scsynth and only succeed once numDefs shows the def registered.
+    calls = []
+
+    class SlowProbe:
+        def __init__(self):
+            self.n = 0
+
+        def __call__(self):
+            self.n += 1
+            return {"numDefs": 1 if self.n > 2 else 0}
+
+    s = ScServer(spawn=RecordingSpawn(calls), probe=SlowProbe())
+    assert s.load_bubbles() is True
+
+
+def test_load_bubbles_times_out_if_def_never_confirms():
+    calls = []
+
+    class NeverConfirms:
+        def __call__(self):
+            return {"numDefs": 0}
+
+    s = ScServer(spawn=RecordingSpawn(calls), probe=NeverConfirms())
+    assert s.load_bubbles(timeout=0.2) is False
 
 
 def test_boot_idempotent():

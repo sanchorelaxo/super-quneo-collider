@@ -154,10 +154,22 @@ class ScServer:
             time.sleep(0.1)
         return False
 
-    def load_bubbles(self) -> bool:
+    def load_bubbles(self, timeout: float = 5.0) -> bool:
         argv = [self._sclang_path or resolve_sclang(), self._def_script]
         proc = self._spawn(argv)
-        return proc.wait() == 0
+        if proc.wait() != 0:
+            return False
+        # scsynth does not ack /d_recv, and the one-shot sclang exits as soon as
+        # the message is queued, so an immediate /s_new can race the delivery.
+        # Confirm the def actually registered (numDefs climbs past zero) before
+        # returning, otherwise the caller's /s_new hits "SynthDef not found".
+        deadline = self._clock() + timeout
+        while self._clock() < deadline:
+            st = self._probe()
+            if st and st.get("numDefs", 0) >= 1:
+                return True
+            time.sleep(0.1)
+        return False
 
     def spawn_bubbles(self, node: int = 1000) -> bool:
         self._send("/s_new", "bubbles", int(node), 0, 0)
