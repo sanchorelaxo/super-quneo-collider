@@ -7,6 +7,27 @@
 <style>
   html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
   #board { position: fixed; inset: 0; }
+  #picker {
+    position: fixed; left: 12px; top: 12px; z-index: 10;
+    font: 12px/1.4 monospace; color: #d8d8e0; background: rgba(0,0,0,0.6);
+    padding: 8px 10px; border-radius: 4px; max-width: 30ch;
+  }
+  #picker label { display: block; color: #7dd67d; margin-bottom: 4px; }
+  #picker .row { display: flex; align-items: center; gap: 6px; }
+  #picker select {
+    font: inherit; background: #101014; color: #d8d8e0;
+    border: 1px solid #33333f; border-radius: 3px; padding: 2px 4px; flex: 1 1 auto;
+    min-width: 0;
+  }
+  #picker .fade {
+    display: flex; align-items: center; gap: 3px; margin: 0; white-space: nowrap;
+    font: 11px/1.4 monospace; color: #9a9ab0; cursor: pointer;
+  }
+  #picker .fade input { margin: 0; accent-color: #7dd67d; }
+  #helper {
+    margin: 8px 0 0; white-space: pre; color: #9a9ab0;
+    font: 11px/1.5 monospace;
+  }
   #status {
     position: fixed; left: 12px; bottom: 12px; z-index: 10;
     font: 12px/1.4 monospace; color: #7dd67d; background: rgba(0,0,0,0.6);
@@ -17,14 +38,30 @@
 </head>
 <body>
 <div id="board"></div>
+<div id="picker">
+  <label for="example">example</label>
+  <div class="row">
+    <select id="example"></select>
+    <label class="fade" for="fade" title="force every sound to fade out after 12 s">
+      <input type="checkbox" id="fade" checked />
+      12 s fade
+    </label>
+  </div>
+  <pre id="helper"></pre>
+</div>
 <div id="status">connecting&hellip;</div>
 <script type="module">
 import { loadLayout } from './src/board.js';
 import { ColliderPane } from './src/pane.js';
 import { buildBoard } from './src/render.js';
+import { getState } from './src/api.js';
+import { mountExamplePicker } from './src/examples.js';
 
 const container = document.getElementById('board');
 const statusEl = document.getElementById('status');
+const selectEl = document.getElementById('example');
+const fadeEl = document.getElementById('fade');
+const helperEl = document.getElementById('helper');
 
 const layout = await loadLayout('./LAYOUT.json');
 const board = buildBoard(layout, container);
@@ -35,11 +72,22 @@ pane.onLit = (control, fraction) => {
   if (light) light.setLit(fraction);
 };
 
+// The picker is a view over the bridge's catalog: the bridge owns the list of
+// examples, the default and the helper text.  A choice POSTs the id and the
+// bridge re-binds the surface; nothing is flashed to the board.  The checkbox
+// beside it toggles the bridge's 12 s fade ceiling the same way.
+const renderPicker = mountExamplePicker({
+  select: selectEl,
+  helper: helperEl,
+  fade: fadeEl,
+});
+
 async function tick() {
   try {
-    const state = await pane.poll();
+    const state = await pane.poll(getState);
     statusEl.className = state.present ? '' : 'offline';
     statusEl.textContent = state.present ? 'live' : 'waiting for bridge&hellip;';
+    renderPicker(state);
   } catch (err) {
     statusEl.className = 'offline';
     statusEl.textContent = 'bridge offline — ' + err.message;

@@ -27,6 +27,12 @@ What we already have, tested and working:
 - `supercollider-quarks/QuNeo` — the `BasicSC_QuNeo` preset that defines which MIDI
   note/CC each control emits.
 
+Beyond `bubbles`, the bridge is growing a small catalog of audio examples: each
+supercolliderjs `examples/` entry whose point is *manipulating sound* (not booting the
+language/server, logging, or loading defs) becomes a selectable entry in the front-end
+UI. `bubbles` is the first and default member of that catalog, not the whole program
+(section 9).
+
 ---
 
 ## 2. System context
@@ -106,6 +112,75 @@ D6. **Presets reach the real QuNeo board for testing only, via a test rig — ne
     they already work); the runtime bridge never imports or invokes the rig, and there
     is no auto-flashing.
 
+D7. **A catalog of audio examples replaces the hard-coded `bubbles` binding.** `bubbles`
+    becomes one of four selectable examples (`bubbles`, `formant`, `sine`, `klang`), each
+    a verbatim — or minimally reshaped — supercolliderjs `examples/` SynthDef plus a list
+    of `param -> control` bindings. The control surface is preset 0 (BasicSC) only: no
+    new preset is flashed, and every example binds onto the SAME fixed controls the board
+    already emits, in a fixed order (vSliders first, then hSliders, then the channel-14
+    rotaries). All four SynthDefs are delivered at boot through the same one-shot sclang
+    `/d_recv` path as `bubbles` (D3), so switching examples is a pure control-plane event:
+    no compile, no board write, and the hot path stays Python + OSC. The example registry
+    lives in `catalog.json`; `mapping.json` keeps only the fixed MIDI inventory
+    (`channel`/`noteNum`/`pressCC`/`locCC`), and its `bubbles`-specific `param`/`min`/
+    `max` move into the catalog's `bubbles` entry.
+
+D8. **Exactly one example is active at a time; selection is a low-frequency write.** The
+    front end owns a `<select>` (top-left of the board). Choosing an entry POSTs its id;
+    the bridge swaps the active example, re-binds the slider scaling, and the next QuNeo
+    activity spawns a fresh node from the newly active SynthDef. A mapping helper text,
+    derived from the catalog (never hand-written), renders next to the select so the user
+    sees which control drives which parameter for the current example.
+
+D9. **The catalog spans three sources, and every example declares a gesture type.**
+    On top of the four supercolliderjs entries (D7), the catalog adds the four SuperCollider
+    documentation examples (`supercollider.github.io/examples.html`) and all 109
+    SCLOrkSynths SynthDefs (SCLOrkHub, 11 banks: bass, bells, drums, guitar, keyboards,
+    misc, organ, pads, percussion, strings, winds). Every entry carries a `gesture`, either
+    `continuous` or `oneshot`:
+
+    - `continuous` — a synth with a `gate` argument (a sustained ADSR held while a pad is
+      down) or a self-running drone. Its parameters bind to the slider/rotary ladder of
+      9.2; a pad press sends gate=1 and a release sends gate=0. This is the `bubbles` model.
+    - `oneshot` — a synth whose own envelope self-frees (Env.perc/Env.sine/Env.linen with
+      doneAction: 2 and no `gate` arg). It binds to a pad CORNER, not a slider: pressing
+      the corner sends /s_new and the synth frees itself. The 16 pads x 4 quadrants yield
+      64 corners (see the appendix). Unpitched one-shots (kicks, claps, hats) fire at fixed
+      args; pitched one-shots (kalimba, bells, plucks) read their pitch from the corner, so
+      one example plays a scale across the grid. Any trailing timbre args still bind to a
+      reserved slider when the user wants to shape the sound.
+
+    The gesture is read off the SynthDef, never guessed: a `gate` arg implies `continuous`,
+    and a doneAction:2 perc/sine envelope with no `gate` implies `oneshot`. Selection
+    remains single-active (D8); a simultaneous multi-corner drum "kit" is a later
+    increment and is out of scope here.
+
+D10. **A voice is never a surprise: the bridge owns it, stops it on command, and caps its
+    life.** Three rules, all enforced in the SynthDef wrapper rather than in the bridge,
+    so they hold for every example and cannot be bypassed by a rogue def:
+
+    - **One live voice per continuous example.** The bridge picks the node id (never
+      `-1`), tracks it, and sends further activity for that example as `/n_set` on the
+      live node. `oneshot` entries spawn per hit and are tracked the same way. When
+      scsynth reports `/n_end` the bridge forgets the id (it needs `/notify 1`, which
+      `boot()` sends), so a dead node is never retuned. The old behaviour — `/s_new`
+      with an auto-assigned id on every CC — is what left `sine` droning forever.
+    - **A 3 s stop fade.** Every def carries `gate` (`1` by default). A new selection, a
+      release, or a change of ceiling mode sends `gate=0`, which runs
+      `Env.asr(0.01, 1, 3)`, so sound fades out instead of clicking off. Nothing sounds
+      at boot: `start()` loads defs and binds controls, but spawns nothing.
+    - **A 12 s ceiling, optional at runtime.** A gate-independent
+      `Env.new([0, 1, 1, 0], [0.01, 9, 3])` fades any voice out at 12 s, whatever the def
+      does on its own. It must not be driven by `gate`, because an `EnvGen` with an open
+      gate holds at its release node forever and would never free the node. The def
+      argument `fade` (1 by default) is the switch: `fade=0` replaces the ceiling with a
+      constant, so the voice rings until its gate closes or it goes silent. `free` is
+      always owned by `DetectSilence` (doneAction 2), never by an example's own envelope
+      (those are demoted to doneAction 0), so no voice leaks in either mode. The front end
+      exposes the switch as a checkbox beside the `<select>`, backed by
+      `POST /api/collider/fade` and `fadeEnabled` on `/api/collider`; the bridge is the
+      state of record, and the page mirrors it on every poll.
+
 ---
 
 ## 4. Component and file layout
@@ -121,12 +196,21 @@ super-quneo-collider/
     midi.py                      <- QuNeo port discovery + aseqdump watcher (ported
                                     from op1-web midi.py, CC-aware)
     map.py                       <- slider -> param scaling (pure function, unit-tested)
-    mapping.json                 <- control id -> noteNum/pressCC/locCC/channel + param
+    mapping.json                 <- control id -> noteNum/pressCC/locCC/channel (fixed
+                                    preset-0 MIDI inventory; carries no per-example param)
+    catalog.json                 <- example registry: id/label/gesture/SynthDef/param ->
+                                    control bindings (source, corner, ranges, curves). It is
+                                    the select's options + helper text + corner assignment
     sc.py                        <- scsynth lifecycle + OSC (/s_new, /n_set, /status)
     bubbles.scd                  <- the bubbles SynthDef (verbatim from bubbles.js)
+    formant.scd                  <- the formant SynthDef (verbatim from formant.scd)
+    sine.scd                     <- the sine SynthDef (reshaped from sine-wave.js)
+    klang.scd                    <- the klang SynthDef (nPartials/nChans promoted to args)
+    examples/*.scd               <- the 4 documentation examples, reshaped into named defs
+    sclork/                      <- the SCLOrkSynths bank, vendored + loaded by its loader
     client/
-      index.html                 <- ported midi pane + three.js board
-      src/*.js                   <- board model, collider pane, poller, api
+      index.html                 <- ported midi pane + three.js board (top-left <select>)
+      src/*.js                   <- board model, collider pane, poller, api + select.js
       vendor/three.module.js ...
       LAYOUT.json                <- queneo-editor layout, extended with MIDI params
   tests/
@@ -176,7 +260,9 @@ appendix at the bottom. It is realized in `mapping.json` as a 30-control MIDI in
 carrying its `channel`/`noteNum`/`pressCC`/`locCC` (and `xCC`/`yCC`/`widthCC` where the
 kind needs them). The watcher tracks live CC and note state for every control, keyed by
 MIDI channel so the channel-14 rotaries do not collide with channel-15 pad `xCC`/`yCC`.
-Only the three vertical sliders above are bound to synth params.
+Only the three vertical sliders above are bound to synth params. That binding is the
+`bubbles` entry of the example catalog; when a different example is selected (section 9),
+the same three sliders re-bind to that example's parameters.
 
 ---
 
@@ -392,6 +478,167 @@ Scenario: channel 14 and channel 15 do not collide
     Then the synth's releaseTime changes on the 2.0 to 6.0 range
     And the vSliderButton2 model lights proportionally
 
+### Feature: Select a sound example
+
+Scenario: the example catalog is exposed
+  Given the bridge is running
+  When the client GETs /api/collider
+  Then the response lists examples "bubbles", "formant", "sine", "klang"
+
+Scenario: bubbles is the default active example
+  Given the bridge is running
+  When the client GETs /api/collider
+  Then activeExample equals "bubbles"
+
+Scenario: every example binds at least one parameter
+  Given the catalog of examples
+  Then every example maps at least one parameter to a control
+
+Scenario Outline: an example's variables scale to the bound control
+  Given example "<example>" is active
+  When locCC <cc> arrives with raw <raw>
+  Then parameter "<param>" equals <expected>
+
+  Examples:
+    | example | cc | raw | param        | expected |
+    | formant | 61 | 127 | fundfreq     | 10240.0  |
+    | formant | 61 | 0   | fundfreq     | 40.0     |
+    | sine    | 61 | 127 | freq         | 2000.0   |
+    | klang   | 61 | 127 | nPartials    | 32       |
+    | klang   | 69 | 127 | nChans       | 8        |
+
+Scenario Outline: selecting an example re-binds the control surface
+  Given example "bubbles" is active
+  When the client selects "<example>"
+  Then activeExample equals "<example>"
+  And locCC 61 now scales to parameter "<param>"
+
+  Examples:
+    | example | param     |
+    | formant | fundfreq  |
+    | sine    | freq      |
+    | klang   | nPartials |
+
+Scenario: selecting an example shows the mapping helper text
+  When the client selects "formant"
+  Then the UI shows helper text naming each control-to-parameter binding for "formant"
+  And the helper text is derived from the catalog, not hard-coded
+
+Scenario: selecting an example never writes to the board
+  Given the bridge is running and preset 0 is loaded
+  When the client selects "sine"
+  Then no preset is flashed and no MIDI is sent to the QuNeo
+
+Scenario: the catalog covers all three sources
+  Given the bridge is running
+  When the client GETs /api/collider
+  Then the response lists 117 examples
+  And the list includes "kick808", "superSaw", "kalimba" and "Simple FM"
+
+Scenario: every example declares a gesture
+  Given the catalog of examples
+  Then every example declares a gesture of "continuous" or "oneshot"
+
+Scenario Outline: a one-shot example triggers on a pad corner
+  Given example "<example>" is active and is a one-shot
+  When the user presses pad <pad> in quadrant <quadrant>
+  Then the bridge sends /s_new for "<def>"
+  And the helper text names "pad <pad>" and quadrant "<quadrant>"
+
+  Examples:
+    | example | pad | quadrant | def      |
+    | kick808 | 3   | 3        | kick808  |
+    | kalimba | 0   | 2        | kalimba  |
+
+Scenario Outline: a pitched one-shot reads its pitch from the corner
+  Given the "kalimba" example is active
+  When the user presses corner index <index>
+  Then /s_new for kalimba is sent with freq <freq>
+
+  Examples:
+    | index | freq   |
+    | 0     | 220.0  |
+    | 63    | 880.0  |
+
+Scenario Outline: a continuous example re-binds the slider ladder
+  Given "superSaw" is active
+  When locCC <cc> arrives with raw <raw>
+  Then parameter "<param>" equals <expected>
+
+  Examples:
+    | cc | raw | param       | expected |
+    | 61 | 0   | detuneRatio | 1.0      |
+    | 61 | 127 | detuneRatio | 1.05     |
+    | 69 | 0   | spread      | 0.0      |
+    | 69 | 127 | spread      | 1.0      |
+
+Scenario: a gated example opens and closes on a pad press
+  Given "superSaw" is active
+  When channel 15 pad note 0 turns on
+  Then /s_new for superSaw is sent with gate=1
+  When channel 15 pad note 0 turns off
+  Then /n_set for the spawned node is sent with gate=0
+
+### Feature: Nothing outlives its welcome
+
+Scenario: nothing sounds until the QuNeo is touched
+  Given the bridge has just started
+  Then no node has been spawned
+  And /api/collider reports voices as an empty list
+
+Scenario: the bridge owns the voice it starts
+  Given example "sine" is active
+  When locCC 61 arrives with raw 64
+  Then /s_new for sine is sent once with a bridge-chosen node id
+  And that id appears in /api/collider voices
+
+Scenario: further activity retunes the live voice
+  Given a voice is sounding for "sine"
+  When locCC 61 arrives again
+  Then no second /s_new is sent
+  And the live node receives /n_set
+
+Scenario: a voice is freed at the 12 s ceiling
+  Given the ceiling is on
+  When a voice is spawned
+  Then scsynth frees it about 12 s later, through the stop fade
+  And /api/collider stops reporting it
+
+Scenario: a stop fades over 3 s rather than cutting
+  Given a voice is sounding
+  When the bridge stops it
+  Then its gate closes and the sound fades out over about 3 s
+
+Scenario: selecting an example stops the sounding voice
+  Given a voice is sounding for "sine"
+  When the client selects "formant"
+  Then the sounding node receives gate=0
+  And the next QuNeo activity spawns from the newly active example
+
+Scenario: the 12 s ceiling can be switched off and on
+  Given the bridge is running with the ceiling on
+  When the client POSTs /api/collider/fade {"enabled": false}
+  Then /api/collider reports fadeEnabled false
+  And the next voice rings past 12 s until something stops it
+  When the client POSTs /api/collider/fade {"enabled": true}
+  Then the ceiling is back on
+  And any voice sounding at that moment stops through the 3 s fade
+
+Scenario: the fade checkbox beside the select shows the bridge's state
+  Given the client page is open
+  Then the checkbox reflects fadeEnabled from /api/collider
+  And a bridge that omits fadeEnabled leaves the ceiling on
+
+Scenario: toggling the checkbox writes to the bridge
+  When the user toggles the checkbox
+  Then the client POSTs the new value to /api/collider/fade
+  And re-renders from the reply
+  And a failed POST is shown in the helper text instead of thrown
+
+Scenario: the bridge rejects a non-boolean ceiling
+  When the client POSTs /api/collider/fade {"enabled": "yes"}
+  Then the bridge answers 400
+
 ---
 
 ## 7. Definition of Done
@@ -414,6 +661,24 @@ Scenario: channel 14 and channel 15 do not collide
 - Preset flashing is test-only: it is driven by `tests/helpers/quneo_flash.py`, which
   boots queneo-editor's editor server; the runtime bridge never imports, starts, or
   invokes it.
+- The front end shows a `<select>` in the top-left listing the 117 catalog examples
+  (grouped by source), defaulting to `bubbles`. Selecting an entry re-binds the bridge and
+  shows the mapping helper text, derived from `catalog.json`.
+- Every voice is owned and bounded, per D10: nothing sounds at boot, further activity
+  retunes the live node instead of stacking new ones, a selection or release closes the
+  gate into a 3 s fade, and a gate-independent 12 s ceiling frees anything still running.
+  The ceiling is switchable from a checkbox beside the select (`POST /api/collider/fade`,
+  `fadeEnabled` on `/api/collider`), with the bridge as the state of record. Both modes
+  are proven on a real scsynth: capped at ~12.5 s with the ceiling on, still ringing at
+  13.5 s with it off, and ~3.5 s from gate=0 to the node's end.
+- Every example maps at least one variable to a control, all on the preset-0 (BasicSC)
+  surface; no new preset is flashed and selection never writes to the board.
+- All 117 SynthDefs are delivered at boot in one sclang batch (the SCLOrkSynths loader
+  plus the documentation and supercolliderjs defs, same one-shot `/d_recv` path), so
+  switching examples performs no compile and keeps the hot path pure Python + OSC.
+- Every entry binds at least one parameter: `continuous` entries on the slider/rotary
+  ladder, `oneshot` entries on a pad corner (with a reserved slider for any trailing
+  timbre arg). The gesture is read off each SynthDef, never hand-assigned.
 
 ---
 
@@ -437,6 +702,225 @@ Scenario: channel 14 and channel 15 do not collide
 3. **QuNeo channel.** BasicSC puts everything on channel 15 (0-indexed, MIDI channel
    16). The watcher filters on this; if the board ships a different default on this
    machine, the channel lives in `mapping.json`, not hard-coded.
+
+---
+
+## 9. The example catalog
+
+The QuNeo is locked to preset 0 (BasicSC, flashed to slot 0). Nothing here adds a new
+preset: the catalog reuses the SAME fixed control surface the board already emits, and
+re-binds it per example. This is the supercolliderjs approach made multi-option — each
+entry is exactly what `bubbles` already is: a SynthDef plus a list of `param -> control`
+bindings. `bubbles` is simply the default and first entry.
+
+### 9.1 Which examples are in
+
+Four of the sixteen `examples/` entries are audio manipulation (a self-contained audible
+SynthDef whose sound you shape). The rest are language/server/utility demos and are out:
+
+| file | example | note |
+|------|---------|------|
+| `bubbles.js`   | bubbles | verbatim (the current spec synth) |
+| `formant.scd`  | formant | verbatim, incl. its `Spec.specs` exp curves |
+| `sine-wave.js` | sine    | reshaped from dryadic `|freq| SinOsc.ar(freq)` into a named SynthDef |
+| `klang.scd`    | klang   | reshaped: `nPartials`/`nChans` promoted from `var` to `arg` |
+
+Excluded (language/server/utility): `boot-lang.js`, `lang-interpret.js`,
+`lang-interpret-the-long-way.js`, `logger.js`, `server.js`, `server-plus.js`,
+`server-plus-promises.js`, `serverp`, `package.json`/`package-lock.json` — and two that
+produce sound but exist to demonstrate API mechanics rather than sound manipulation:
+`synthdef-and-synth.js` (a SynthDef-loading walkthrough) and
+`dryads-synth-event-list.js` (a drum-scheduler demo whose frequencies are random).
+
+Two more sources extend the catalog: the four SuperCollider documentation examples
+(section 9.7) and all 109 SCLOrkSynths SynthDefs (section 9.8). The full catalog is 117
+entries: 4 supercolliderjs + 4 documentation + 109 SCLOrkSynths.
+
+### 9.2 Example parameters and their QuNeo bindings
+
+One example is active at a time; the same physical controls are re-bound to that
+example's parameters. Binding order is fixed and top-to-bottom: vSlider0 → vSlider1 →
+vSlider2 → vSlider3, then hSliders, then the channel-14 rotaries. The first variable of
+an example always lands on vSlider0, and a one-variable example (sine) uses only that
+one slider. This is the direct generalization of "bubbles is mapped to the vSliders".
+
+| example  | vSlider0 (cc 61) | vSlider1 (cc 69) | vSlider2 (cc 77) | vSlider3 (cc 85) | extra |
+|----------|------------------|------------------|------------------|------------------|-------|
+| bubbles  | wobble 0–10 (lin) | innerWobble 0–16 (lin) | releaseTime 2–6 (lin) | — | — |
+| formant  | fundfreq 40–10240 (exp) | formantfreq 40–10240 (exp) | bwfreq 40–10240 (exp) | timeScale 0.1–4 (lin) | pan −1–1 → rotary0 (ch14 cc 1) |
+| sine     | freq 40–2000 (exp) | — | — | — | — |
+| klang    | nPartials 1–32 (int) | nChans 1–8 (int) | — | — | — |
+
+Defaults and curves track the source: `fundfreq`/`formantfreq` default 440, `bwfreq`
+100; `sine.freq` defaults 440; `klang.nPartials` defaults 12 and `nChans` 5. Integer
+parameters (`nPartials`, `nChans`) scale the raw CC to a rounded integer.
+
+### 9.3 Reshapes (and why they stay faithful)
+
+- **sine** — `sine-wave.js` compiles `|freq| SinOsc.ar(freq)` through the dryadic
+  API. We express the same graph as `SynthDef("sine", { arg out=0, freq=440;
+  Out.ar(out, SinOsc.ar(freq)); })` so it can be delivered and driven over OSC like
+  `bubbles`. No timbre change.
+- **klang** — `klang.scd` has no `arg`s; `nPartials` (12) and `nChans` (5) are local
+  `var`s and the partial frequencies are `rrand`-generated at build time. We promote
+  `nPartials` and `nChans` to `arg`s and keep the random 200–2000 Hz partials
+  (re-rolled per spawn). This is the only reshape that changes a definition's shape;
+  it exists solely to give the example at least one controllable variable.
+
+### 9.4 Data model — `mapping.json` vs `catalog.json`
+
+- `mapping.json` keeps its role as the FIXED preset-0 MIDI inventory: which
+  `channel`/`noteNum`/`pressCC`/`locCC` each control emits. It drops its three
+  `bubbles`-specific `param`/`min`/`max` fields.
+- `catalog.json` is the new source of truth for the select and the helper text:
+
+```json
+{
+  "default": "bubbles",
+  "examples": {
+    "formant": {
+      "def": "formant",
+      "source": "formant.scd",
+      "params": [
+        {"name": "fundfreq",    "control": "vSliderButton0", "cc": 61, "min": 40, "max": 10240, "curve": "exp", "default": 440},
+        {"name": "formantfreq", "control": "vSliderButton1", "cc": 69, "min": 40, "max": 10240, "curve": "exp", "default": 440},
+        {"name": "bwfreq",      "control": "vSliderButton2", "cc": 77, "min": 40, "max": 10240, "curve": "exp", "default": 100},
+        {"name": "timeScale",   "control": "vSliderButton3", "cc": 85, "min": 0.1, "max": 4.0, "curve": "lin", "default": 1},
+        {"name": "pan",         "control": "rotaryButton0",  "cc": 1, "channel": 14, "min": -1, "max": 1, "curve": "lin", "default": 0}
+      ]
+    }
+  }
+}
+```
+
+Each `param`'s `control` names a `mapping.json` control id, so the binding resolves its
+MIDI identity through the inventory (never a duplicated literal).
+
+### 9.5 Selection and helper text
+
+- `/api/collider` gains `examples` (the ordered id list) and `activeExample` fields.
+- `POST /api/collider/example` with `{"id": "formant"}` switches the active example:
+  the bridge re-binds the slider scaling and the next QuNeo activity spawns a fresh
+  node from the newly active SynthDef. No compile, no board write.
+- The front end renders a `<select>` in the top-left corner from `examples`, defaulting
+  to `bubbles`. On change it POSTs the id, then re-renders.
+- A `fade` checkbox sits beside the select, checked by default, exposing the 12 s ceiling
+  of D10. The bridge holds the state (`fadeEnabled`), so the page re-renders the box from
+  each poll rather than trusting its own memory, and a toggle POSTs
+  `/api/collider/fade {"enabled": <bool>}`.
+- A helper text under the select is re-generated from the active example's `params`,
+  one line per binding, e.g. for `formant`:
+
+```
+vSlider0 -> fundfreq     40-10240 Hz (exp)
+vSlider1 -> formantfreq  40-10240 Hz (exp)
+vSlider2 -> bwfreq       40-10240 Hz (exp)
+vSlider3 -> timeScale    0.1-4.0
+rotary   -> pan          L..R
+```
+
+### 9.6 Trigger surfaces: sliders for continuous, corners for one-shots
+
+Every entry carries a `gesture` (D9) that decides its primary control surface.
+
+`continuous` examples use the slider/rotary ladder of 9.2 unchanged. A gated synth also
+uses a pad press as its note: press = gate=1 (spawn), release = gate=0 (release). A
+self-running drone needs no note; it starts when selected and frees when deselected.
+
+`oneshot` examples use the 64-corner pad surface. The corner is the trigger: a press on
+corner `c` sends `/s_new` for the example's SynthDef, and the synth's doneAction frees it.
+Corner addressing is `pad` (0..15) x `quadrant` (0..3), flattened to an index 0..63 where
+index = pad*4 + quadrant. Two one-shot flavors:
+
+- Unpitched (kick808, claps, hats): the corner fires the sound at its default args. A
+  trailing timbre arg (`dist`, `ringTime`) binds to a reserved slider so the sound is still
+  shapable — that is the "min 1" control.
+- Pitched (kalimba, bells, plucks, marimba): the corner also sets pitch. The corner index
+  maps to `freq` over a musical range, so a single example plays a scale across the grid
+  (e.g. index 0..63 -> 220 Hz to 880 Hz). A trailing timbre arg (`mix`, `clickRel`) binds
+  to a reserved slider.
+
+Helper text names the corner for a one-shot (e.g. "pad 3 · top-right -> kick808") instead
+of a slider binding. Selection stays single-active (D8); a kit that arms many corners at
+once is deferred.
+
+### 9.7 The SuperCollider documentation examples
+
+`examples.html` showcases four examples. Three are `.play` functions or a `Pbind`
+performance, not catalog-shaped SynthDefs, so each is reshaped into a named, OSC-driven
+def as needed (the same rule as `sine`/`klang` in 9.3). All four are in:
+
+| example    | gesture             | min-1 binding                                   | note |
+|------------|---------------------|-------------------------------------------------|------|
+| Simple FM  | continuous (drone)  | vSlider0 -> modRate (0.1-20 Hz)                 | `[1,3]` LFO exprange promoted to args |
+| Chainsaw   | continuous (drone)  | vSlider0 -> amp (level)                         | self-running noise machine |
+| Drummer    | continuous (drone)  | vSlider0 -> tempo                               | self-running bdrum/snare/hihat pattern |
+| Gabber Rave| mixed               | gabberkick -> corner (oneshot); hoover -> pad + vSlider0 -> freq | two defs + a kick loop |
+
+The three drones run for as long as they are selected and free on deselect; Gabber Rave
+exposes its one-shot kick on a corner and its gated `hoover` lead on the pad/slider path.
+
+### 9.8 SCLOrkSynths — the standard-arg convention and the 11 banks
+
+SCLOrkSynths ships 109 SynthDefs grouped in 11 banks. They share a documented standard-arg
+convention, which is what makes a deterministic (not hand-guessed) binding possible:
+
+```
+out = 0      pan = 0      freq = 440 (pitched synths only)
+amp ~ 0.1-0.2   att = 0.01 (0.001 for percussive)   dec = 0.1   sus = 1
+rel ~ 1 (up to ~3)   gate = 1 (ADSR synths only)    crv/curve = -8
+```
+
+Every synth adds a handful of bespoke timbre args on top (count, spread, detuneRatio,
+blend, dist, mix, ringTime, clickRel, ...). Because `freq`/`amp`/`att`/`rel` are always
+present, every one of the 109 has at least one bindable parameter — "min 1" holds by
+construction.
+
+Gesture is read off each def (D9): a `gate` arg -> `continuous` (pads, organ, strings,
+wind, keyboards, lead bass and guitar voices, sustained pads), otherwise a
+doneAction:2 perc envelope -> `oneshot` (all 31 drums, all 9 percussion, the 6 bells,
+plucks, harpsichord, and percussive bass like `subBass1`/`acidOto309`).
+
+Banks (109 total):
+
+```
+bass (13)         acidOto3091, acidOto3092, bassWarsaw, combs, doubleBass, fmBass,
+                  ikedaBass, ksBass, moogBass, noQuarter, rubberBand, subBass1, subBass2
+bells (6)         glockenspiel, prayerBell, pulseRisset, rissetBell, sosBell, tubularBell
+drums (31)        blueNoise, clapElectro, clapGray, clapOto309, cymbal808, cymbalicMCLD,
+                  hashercymbal, hihat1, hihatElectro, kick1, kick808, kickBlocks, kickRingz,
+                  kick_chirp, kick_electro, kick_oto309, kik3, kraftySnare, neuroSnare,
+                  oneclapThor, purpleNoise, snare1, snare909, snareElectro, snareOto309,
+                  snareStein, sosHats, sosKick, sosSnare, sosTom, squareDrum
+guitar (3)        distortedGuitar, modalElectricGuitar, pluck
+keyboards (8)     cheapPiano1, cs80leadMH, defaultB, everythingRhodes, FMRhodes1,
+                  FMRhodes2, harpsichord1, harpsichord2
+misc (19)         beating, blip1, chaoscillator, crossoverDistortion, decimator, laserbeam,
+                  moreHarmonics, musicBox, noisy, phazer, ping_mh, saturatingWavefolder,
+                  sillyVoice, sputter, triangleWaveBells, trig_demo, vintageSine, werkit, werkit2
+organ (7)         organDonor, organReed, organTonewheel0..4
+pads (9)          apadMH, arpoctave, feedbackPad1..3, line, midSideSaw, sawSynth, superSaw
+percussion (9)    abstractDrum, frameDrum, kalimba, marimba1, metalPlate, modalMarimba,
+                  pmCrotales, steelDrum, xylophone
+strings (3)       prophet5pwmStrings, strings, violin
+winds (1)         waveguideFlute
+```
+
+Worked mappings (the four verified against their source):
+
+- `kick808` — `oneshot`. Args: out, freq1=240, freq2=60, amp=1, ringTime=10, att,
+  rel=1, dist=0.5, pan. Corner -> /s_new at defaults; `dist` 0..1 -> vSlider3.
+- `kalimba` — `oneshot` (pitched). Args: out, freq=440, amp=0.1, att, rel=3, pan,
+  crv=-8, mix=0.1, clickRel=0.01. Corner index 0..63 -> freq; `mix` 0..1 -> vSlider3.
+- `subBass1` — `oneshot`. Env.perc, no gate. Corner -> /s_new; `blend` 0..1 -> vSlider3.
+- `superSaw` — `continuous` (gate). Gated ADSR; pad press = gate. `detuneRatio` and
+  `spread` -> vSlider0/vSlider1; `freq` -> pad x/y or vSlider2.
+
+Full per-synth `catalog.json` authoring (exact bespoke args and ranges for the other 105)
+is the implementation step. The spec fixes the convention and the gesture rule, so that
+authoring is mechanical, not judgment.
+
+also see https://github.com/SCLOrkHub/SCLOrkSynths/tree/master/in-process/Completed (might be simpler to impl on 1st pass?)
 
 ---
 

@@ -309,7 +309,7 @@ class MidiWatcher:
                     else:
                         self._cc.setdefault(ev["channel"], {})[ev["cc"]] = ev["value"]
                         if self._on_event is not None:
-                            self._on_event(ev["cc"], ev["value"])
+                            self._on_event(ev["cc"], ev["value"], ev["channel"])
                         self._save()
         except (OSError, ValueError):
             pass  # stdout closed by teardown or the child died

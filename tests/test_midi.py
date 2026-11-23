@@ -190,7 +190,7 @@ class TestWatcherState:
         watcher, _ = make_watcher(
             lines=[" 24:0   Control change         15, controller 61, value 64"],
             tmp_path=tmp_path,
-            on_event=lambda cc, value: seen.append((cc, value)),
+            on_event=lambda cc, value, channel: seen.append((cc, value)),
         )
         watcher.tick()
         assert wait_for(lambda: len(seen) == 1)
