@@ -118,7 +118,9 @@ def test_catalog_onset_and_gesture_distinguish_drones_from_one_shots(catalog):
     # ...hoover re-triggers on note... and gabberkick is a one-shot...
     assert examples["hoover"]["onset"] == "note"
     assert examples["gabberkick"]["gesture"] == "oneshot"
-    # ...while the four stage-one examples declare no onset (default: cc).
+    assert "onset" not in examples["gabberkick"]
+    # ...while the four stage-one examples declare no onset (default: cc),
+    # and gabberkick (oneshot) also defaults to cc onset.
     for legacy in ("bubbles", "formant", "sine", "klang"):
         assert "onset" not in examples[legacy]
 
