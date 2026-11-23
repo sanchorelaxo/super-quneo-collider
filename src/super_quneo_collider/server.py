@@ -93,6 +93,11 @@ class ColliderApp:
         """How the active example answers activity (``continuous``/``oneshot``)."""
         return self.catalog["examples"][self.active]["gesture"]
 
+    @property
+    def onset(self) -> str:
+        """What starts the active example's voice (``cc``/``note``/``select``)."""
+        return self.catalog["examples"][self.active].get("onset", "cc")
+
     def start(self) -> None:
         """Boot scsynth, deliver the defs, route audio, watch MIDI.
 
@@ -111,7 +116,28 @@ class ColliderApp:
         if b is None:
             return
         self.sliders[b["param"]] = scale_value(raw, b["min"], b["max"], b["curve"])
-        self._trigger()
+        # A oneshot's reserved slider only shapes the next hit, so moving it
+        # must not fire one (the corner/note does).
+        if self.gesture != "oneshot":
+            self._trigger()
+
+    def on_note(self, note, on, channel=None) -> None:
+        """Route a pad note to the active example's voice (SPEC §9.6/§9.7).
+
+        The note number is deliberately not mapped to ``freq`` here — the only
+        pitched/gated entry (hoover) takes pitch from vSlider0, and pad->freq
+        mapping is §9.8's pitched-oneshot work.
+        """
+        if self.gesture == "oneshot":
+            if on:
+                self._trigger()
+            return
+        if self.onset != "note":
+            return  # cc- and select-onset examples do not bind notes
+        if on:
+            self._gate_on()
+        else:
+            self._gate_off()
 
     def select_example(self, example_id) -> bool:
         """Make ``example_id`` active, stopping whatever is sounding.
@@ -127,6 +153,10 @@ class ColliderApp:
         self._stop_voices()
         self.active = example_id
         self._bind()
+        # A self-running drone starts the moment it is selected (its voice was
+        # already faded out by _stop_voices above, so this spawns a fresh one).
+        if self.onset == "select":
+            self._trigger()
         return True
 
     def set_fade(self, enabled) -> bool:
@@ -188,6 +218,20 @@ class ColliderApp:
                 return node
         return None
 
+    def _gate_on(self) -> None:
+        """Open the gate: spawn the gated voice, or re-open it if still alive."""
+        node = self._live(self.active)
+        if node is None:
+            self._trigger()  # spawns at the def's default gate=1
+        else:
+            self.sc.set_param(node, "gate", 1)
+
+    def _gate_off(self) -> None:
+        """Close the gate on the live gated voice, if there is one."""
+        node = self._live(self.active)
+        if node is not None:
+            self.sc.set_param(node, "gate", 0)
+
     def status(self) -> dict:
         state = self.midi.state()
         return {
@@ -198,6 +242,7 @@ class ColliderApp:
                     "def": entry["def"],
                     "source": entry["source"],
                     "gesture": entry["gesture"],
+                    "onset": entry.get("onset", "cc"),
                 }
                 for example_id, entry in self.catalog["examples"].items()
             ],

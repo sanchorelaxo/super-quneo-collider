@@ -598,3 +598,75 @@ def test_api_rejects_an_unknown_post_path():
     with running_server() as (port, _app):
         status, _ctype, _body = _request(port, "POST", "/api/collider/nope", {})
         assert status == 404
+
+
+# --- corner triggers: oneshot / gated-note / drone (SPEC §9.6/§9.7) --------
+
+
+def test_oneshot_note_on_spawns_a_fresh_voice_per_press():
+    app = make_app(active="gabberkick")
+    app.start()
+    app.on_note(3, True)
+    assert len(app.sc.spawns) == 1
+    def_name, first_node, _args = app.sc.spawns[0]
+    assert def_name == "gabberkick"
+    assert first_node >= 1000
+    # a second press is a second voice, under a distinct node id
+    app.on_note(3, True)
+    assert len(app.sc.spawns) == 2
+    assert app.sc.spawns[1][1] != first_node
+    # note-off does not spawn and does not retune a oneshot
+    app.on_note(3, False)
+    assert len(app.sc.spawns) == 2
+    assert not any(call[0] == "set_param" for call in app.sc.calls)
+
+
+def test_oneshot_slider_move_does_not_spawn():
+    app = make_app(active="gabberkick")
+    app.start()
+    app.on_cc(85, 90)  # the reserved vSlider3 -> bend
+    assert app.status()["sliders"]["bend"] == 0.825
+    assert app.sc.spawns == []
+    assert app.sc.params == []
+
+
+def test_gated_note_spawns_on_press_and_gates_off_on_release():
+    app = make_app(active="hoover")
+    app.start()
+    app.on_note(5, True)
+    assert len(app.sc.spawns) == 1
+    def_name, node, args = app.sc.spawns[0]
+    assert def_name == "hoover"
+    # gate=1 is the def default, so the spawn carries no gate key
+    assert "gate" not in args
+    # release gates the live voice off
+    app.on_note(5, False)
+    assert ("set_param", node, "gate", 0) in app.sc.calls
+    # a later press re-gates the still-alive voice instead of stacking a second
+    app.on_note(3, True)
+    assert len(app.sc.spawns) == 1
+    assert ("set_param", node, "gate", 1) in app.sc.calls
+
+
+def test_drone_starts_on_select_and_fades_on_deselect():
+    app = make_app(active="bubbles")
+    app.start()
+    assert app.select_example("simpleFM") is True
+    assert len(app.sc.spawns) == 1
+    assert app.sc.spawns[0][0] == "simpleFM"
+    drone = app.sc.spawns[0][1]
+    # deselecting to a cc-onset example fades the drone and stays silent
+    assert app.select_example("bubbles") is True
+    assert app.sc.params == [(drone, {"gate": 0})]
+    assert len(app.sc.spawns) == 1
+
+
+def test_status_reports_onset_per_example():
+    st = make_app().status()
+    by_id = {e["id"]: e for e in st["examples"]}
+    assert by_id["simpleFM"]["onset"] == "select"
+    assert by_id["chainsaw"]["onset"] == "select"
+    assert by_id["drummer"]["onset"] == "select"
+    assert by_id["hoover"]["onset"] == "note"
+    assert by_id["bubbles"]["onset"] == "cc"
+    assert by_id["gabberkick"]["onset"] == "cc"
