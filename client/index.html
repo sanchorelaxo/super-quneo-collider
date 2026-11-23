@@ -21,7 +21,7 @@
 <script type="module">
 import { loadLayout } from './src/board.js';
 import { ColliderPane } from './src/pane.js';
-import { buildBoard, lightSegments, SEGMENTS } from './src/render.js';
+import { buildBoard } from './src/render.js';
 
 const container = document.getElementById('board');
 const statusEl = document.getElementById('status');
@@ -29,10 +29,10 @@ const statusEl = document.getElementById('status');
 const layout = await loadLayout('./LAYOUT.json');
 const board = buildBoard(layout, container);
 
-const pane = new ColliderPane(layout.controls, { segments: SEGMENTS });
-pane.onLit = (control, lit) => {
-  const segments = board.sliderSegments.get(control.id);
-  if (segments) lightSegments(segments, lit);
+const pane = new ColliderPane(layout.controls);
+pane.onLit = (control, fraction) => {
+  const light = board.lights.get(control.id);
+  if (light) light.setLit(fraction);
 };
 
 async function tick() {

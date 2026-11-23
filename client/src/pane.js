@@ -1,42 +1,34 @@
-// ColliderPane — the SPEC §6 "collider pane". Maps synth parameter values from
-// /api/collider onto the board model's sliders and computes their lit segments.
-// It emits through an `onLit(control, litSegments, fraction)` callback so the
-// pane itself carries no three.js dependency; the renderer subscribes to it.
+// ColliderPane — SPEC §6 "collider pane". Maps the bridge's raw cc/note state
+// (/api/collider) onto every board control's lit fraction and emits it through
+// `onLit(control, fraction)`. Fraction is 0..1: continuous controls derive it
+// from their channel's locCC, pads/buttons from their channel's note on/off.
+// The pane carries no three.js dependency; the renderer subscribes via onLit.
 
-import { litFraction } from './board.js';
+import { controlFraction } from './board.js';
 
 export class ColliderPane {
   /**
    * @param {Array<object>} controls normalized board controls (from board.js)
-   * @param {{segments?: number}} [opts]
+   * @param {{segments?: number}} [opts] reserved — segment count lives in the renderer
    */
   constructor(controls, { segments = 8 } = {}) {
+    this.controls = controls;
     this.segments = segments;
-    this.byParam = new Map(); // param name -> control
-    this.values = new Map();  // param name -> latest value
-    this.onLit = null;        // (control, litSegments, fraction) => void
-    for (const c of controls) {
-      if (c.param != null) this.byParam.set(c.param, c);
-    }
+    this.onLit = null; // (control, fraction) => void
   }
 
-  /** Apply a single param=value pair. Returns false when the param is unbound. */
-  apply(param, value) {
-    const control = this.byParam.get(param);
-    if (!control) return false;
-    this.values.set(param, value);
-    const fraction = litFraction(control, value);
-    const lit = fraction == null ? 0 : Math.round(fraction * this.segments);
-    if (this.onLit) this.onLit(control, lit, fraction);
-    return true;
-  }
-
-  /** Apply a full /api/collider state object. Returns count of params applied. */
+  /**
+   * Push one lit frame for the whole board from a /api/collider state object.
+   * Emits onLit for every control (dark or lit) and returns the control count.
+   */
   applyState(state) {
-    const sliders = (state && state.sliders) || {};
+    const cc = (state && state.cc) || {};
+    const note = (state && state.note) || {};
     let applied = 0;
-    for (const [param, value] of Object.entries(sliders)) {
-      if (this.apply(param, value)) applied++;
+    for (const control of this.controls) {
+      const fraction = controlFraction(control, cc, note);
+      if (this.onLit) this.onLit(control, fraction);
+      applied++;
     }
     return applied;
   }

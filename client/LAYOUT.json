@@ -1,71 +1,551 @@
 {
-  "units": "mm",
-  "channel": 15,
-  "board": {
-    "w": 241.0,
-    "h": 185.0,
-    "thickness": 9.5,
-    "corner_radius": 6.0,
-    "origin": "top-left of board footprint, x right, y down (front of board)"
+ "units": "mm",
+ "channel": 15,
+ "board": {
+  "w": 241.0,
+  "h": 185.0,
+  "thickness": 9.5,
+  "corner_radius": 6.0,
+  "origin": "top-left of board footprint, x right, y down (front of board)"
+ },
+ "source": "collider board \u2014 full 38-control surface (geometry from queneo-editor LAYOUT.json, MIDI from mapping.json)",
+ "controls": [
+  {
+   "id": "buttonButton0",
+   "kind": "button",
+   "shape": "circle",
+   "cx_mm": 19.9,
+   "cy_mm": 15.9,
+   "w_mm": 10.1,
+   "h_mm": 9.7,
+   "noteNum": 36,
+   "pressCC": 124
   },
-  "source": "collider board — 4 vertical sliders (geometry from queneo-editor LAYOUT.json, MIDI params mirror mapping.json)",
-  "controls": [
-    {
-      "id": "vSliderButton0",
-      "kind": "vslider",
-      "shape": "pill_track",
-      "cx_mm": 19.2,
-      "cy_mm": 151.8,
-      "w_mm": 11.9,
-      "h_mm": 48.0,
-      "noteNum": 20,
-      "pressCC": 60,
-      "locCC": 61,
-      "param": "wobble",
-      "min": 0.0,
-      "max": 10.0
-    },
-    {
-      "id": "vSliderButton1",
-      "kind": "vslider",
-      "shape": "pill_track",
-      "cx_mm": 38.0,
-      "cy_mm": 151.8,
-      "w_mm": 11.9,
-      "h_mm": 48.0,
-      "noteNum": 24,
-      "pressCC": 68,
-      "locCC": 69,
-      "param": "innerWobble",
-      "min": 0.0,
-      "max": 16.0
-    },
-    {
-      "id": "vSliderButton2",
-      "kind": "vslider",
-      "shape": "pill_track",
-      "cx_mm": 56.9,
-      "cy_mm": 151.8,
-      "w_mm": 11.9,
-      "h_mm": 48.0,
-      "noteNum": 28,
-      "pressCC": 76,
-      "locCC": 77,
-      "param": "releaseTime",
-      "min": 2.0,
-      "max": 6.0
-    },
-    {
-      "id": "vSliderButton3",
-      "kind": "vslider",
-      "shape": "pill_track",
-      "cx_mm": 75.7,
-      "cy_mm": 151.8,
-      "w_mm": 11.9,
-      "h_mm": 48.0,
-      "noteNum": 32,
-      "pressCC": 84,
-      "locCC": 85
-    }
-  ]
+  {
+   "id": "buttonButton1",
+   "kind": "button",
+   "shape": "diamond",
+   "cx_mm": 40.7,
+   "cy_mm": 16.1,
+   "w_mm": 13.0,
+   "h_mm": 12.9,
+   "noteNum": 37,
+   "pressCC": 125
+  },
+  {
+   "id": "buttonButton10",
+   "kind": "button",
+   "shape": "up_down_arrows",
+   "cx_mm": 220.9,
+   "cy_mm": 164.1,
+   "w_mm": 13.3,
+   "h_mm": 21.0
+  },
+  {
+   "id": "buttonButton2",
+   "kind": "button",
+   "shape": "square",
+   "cx_mm": 59.3,
+   "cy_mm": 15.9,
+   "w_mm": 11.9,
+   "h_mm": 11.3,
+   "noteNum": 38,
+   "pressCC": 126
+  },
+  {
+   "id": "buttonButton3",
+   "kind": "button",
+   "shape": "triangle_right",
+   "cx_mm": 78.2,
+   "cy_mm": 15.7,
+   "w_mm": 11.7,
+   "h_mm": 11.5
+  },
+  {
+   "id": "buttonButton4",
+   "kind": "button",
+   "shape": "left_right_arrows",
+   "cx_mm": 19.9,
+   "cy_mm": 31.0,
+   "w_mm": 19.1,
+   "h_mm": 9.4
+  },
+  {
+   "id": "buttonButton5",
+   "kind": "button",
+   "shape": "left_right_arrows",
+   "cx_mm": 20.0,
+   "cy_mm": 48.0,
+   "w_mm": 19.4,
+   "h_mm": 9.4
+  },
+  {
+   "id": "buttonButton6",
+   "kind": "button",
+   "shape": "left_right_arrows",
+   "cx_mm": 20.0,
+   "cy_mm": 65.1,
+   "w_mm": 19.4,
+   "h_mm": 9.4
+  },
+  {
+   "id": "buttonButton7",
+   "kind": "button",
+   "shape": "left_right_arrows",
+   "cx_mm": 20.3,
+   "cy_mm": 82.1,
+   "w_mm": 18.8,
+   "h_mm": 9.4
+  },
+  {
+   "id": "buttonButton8",
+   "kind": "button",
+   "shape": "rhombus",
+   "cx_mm": 47.3,
+   "cy_mm": 123.3,
+   "w_mm": 11.9,
+   "h_mm": 8.4
+  },
+  {
+   "id": "buttonButton9",
+   "kind": "button",
+   "shape": "up_down_arrows",
+   "cx_mm": 98.1,
+   "cy_mm": 164.1,
+   "w_mm": 13.3,
+   "h_mm": 21.0
+  },
+  {
+   "id": "hSliderButton0",
+   "kind": "hslider",
+   "shape": "pill_track",
+   "cx_mm": 59.1,
+   "cy_mm": 31.0,
+   "w_mm": 48.8,
+   "h_mm": 11.5,
+   "noteNum": 39,
+   "pressCC": 92,
+   "locCC": 93
+  },
+  {
+   "id": "hSliderButton1",
+   "kind": "hslider",
+   "shape": "pill_track",
+   "cx_mm": 59.1,
+   "cy_mm": 48.0,
+   "w_mm": 48.8,
+   "h_mm": 11.5,
+   "noteNum": 43,
+   "pressCC": 100,
+   "locCC": 101
+  },
+  {
+   "id": "hSliderButton2",
+   "kind": "hslider",
+   "shape": "pill_track",
+   "cx_mm": 59.1,
+   "cy_mm": 65.1,
+   "w_mm": 48.8,
+   "h_mm": 11.5,
+   "noteNum": 47,
+   "pressCC": 108,
+   "locCC": 109
+  },
+  {
+   "id": "hSliderButton3",
+   "kind": "hslider",
+   "shape": "pill_track",
+   "cx_mm": 59.1,
+   "cy_mm": 82.1,
+   "w_mm": 48.8,
+   "h_mm": 11.5,
+   "noteNum": 51,
+   "pressCC": 116,
+   "locCC": 117
+  },
+  {
+   "id": "lSliderButton0",
+   "kind": "lslider",
+   "shape": "pill_track",
+   "cx_mm": 159.5,
+   "cy_mm": 168.5,
+   "w_mm": 97.3,
+   "h_mm": 11.5,
+   "noteNum": 16,
+   "pressCC": 48,
+   "locCC": 49,
+   "widthCC": 50
+  },
+  {
+   "id": "padButton0",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 106.1,
+   "cy_mm": 133.7,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 0,
+   "pressCC": 0,
+   "xCC": 1,
+   "yCC": 2,
+   "grid": [
+    3,
+    0
+   ],
+   "note_offset": 0
+  },
+  {
+   "id": "padButton1",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 141.3,
+   "cy_mm": 133.7,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 1,
+   "pressCC": 3,
+   "xCC": 4,
+   "yCC": 5,
+   "grid": [
+    3,
+    1
+   ],
+   "note_offset": 1
+  },
+  {
+   "id": "padButton10",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 176.6,
+   "cy_mm": 63.4,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 10,
+   "pressCC": 30,
+   "xCC": 31,
+   "yCC": 32,
+   "grid": [
+    1,
+    2
+   ],
+   "note_offset": 10
+  },
+  {
+   "id": "padButton11",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 211.8,
+   "cy_mm": 63.4,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 11,
+   "pressCC": 33,
+   "xCC": 34,
+   "yCC": 35,
+   "grid": [
+    1,
+    3
+   ],
+   "note_offset": 11
+  },
+  {
+   "id": "padButton12",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 106.1,
+   "cy_mm": 27.9,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 12,
+   "pressCC": 36,
+   "xCC": 37,
+   "yCC": 38,
+   "grid": [
+    0,
+    0
+   ],
+   "note_offset": 12
+  },
+  {
+   "id": "padButton13",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 141.3,
+   "cy_mm": 27.9,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 13,
+   "pressCC": 39,
+   "xCC": 40,
+   "yCC": 41,
+   "grid": [
+    0,
+    1
+   ],
+   "note_offset": 13
+  },
+  {
+   "id": "padButton14",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 176.6,
+   "cy_mm": 27.9,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 14,
+   "pressCC": 42,
+   "xCC": 43,
+   "yCC": 44,
+   "grid": [
+    0,
+    2
+   ],
+   "note_offset": 14
+  },
+  {
+   "id": "padButton15",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 211.8,
+   "cy_mm": 27.9,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 15,
+   "pressCC": 45,
+   "xCC": 46,
+   "yCC": 47,
+   "grid": [
+    0,
+    3
+   ],
+   "note_offset": 15
+  },
+  {
+   "id": "padButton2",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 176.6,
+   "cy_mm": 133.7,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 2,
+   "pressCC": 6,
+   "xCC": 7,
+   "yCC": 8,
+   "grid": [
+    3,
+    2
+   ],
+   "note_offset": 2
+  },
+  {
+   "id": "padButton3",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 211.8,
+   "cy_mm": 133.7,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 3,
+   "pressCC": 9,
+   "xCC": 10,
+   "yCC": 11,
+   "grid": [
+    3,
+    3
+   ],
+   "note_offset": 3
+  },
+  {
+   "id": "padButton4",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 106.1,
+   "cy_mm": 97.5,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 4,
+   "pressCC": 12,
+   "xCC": 13,
+   "yCC": 14,
+   "grid": [
+    2,
+    0
+   ],
+   "note_offset": 4
+  },
+  {
+   "id": "padButton5",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 141.3,
+   "cy_mm": 97.5,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 5,
+   "pressCC": 15,
+   "xCC": 16,
+   "yCC": 17,
+   "grid": [
+    2,
+    1
+   ],
+   "note_offset": 5
+  },
+  {
+   "id": "padButton6",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 176.6,
+   "cy_mm": 97.5,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 6,
+   "pressCC": 18,
+   "xCC": 19,
+   "yCC": 20,
+   "grid": [
+    2,
+    2
+   ],
+   "note_offset": 6
+  },
+  {
+   "id": "padButton7",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 211.8,
+   "cy_mm": 97.5,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 7,
+   "pressCC": 21,
+   "xCC": 22,
+   "yCC": 23,
+   "grid": [
+    2,
+    3
+   ],
+   "note_offset": 7
+  },
+  {
+   "id": "padButton8",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 106.1,
+   "cy_mm": 63.4,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 8,
+   "pressCC": 24,
+   "xCC": 25,
+   "yCC": 26,
+   "grid": [
+    1,
+    0
+   ],
+   "note_offset": 8
+  },
+  {
+   "id": "padButton9",
+   "kind": "pad",
+   "shape": "rounded_square",
+   "cx_mm": 141.3,
+   "cy_mm": 63.4,
+   "w_mm": 30.2,
+   "h_mm": 29.7,
+   "noteNum": 9,
+   "pressCC": 27,
+   "xCC": 28,
+   "yCC": 29,
+   "grid": [
+    1,
+    1
+   ],
+   "note_offset": 9
+  },
+  {
+   "id": "rotaryButton0",
+   "kind": "rotary",
+   "shape": "drum_circle",
+   "cx_mm": 27.7,
+   "cy_mm": 108.8,
+   "w_mm": 33.7,
+   "h_mm": 32.8,
+   "noteNum": 0,
+   "pressCC": 0,
+   "locCC": 1,
+   "channel": 14
+  },
+  {
+   "id": "rotaryButton1",
+   "kind": "rotary",
+   "shape": "drum_circle",
+   "cx_mm": 67.7,
+   "cy_mm": 108.8,
+   "w_mm": 33.7,
+   "h_mm": 32.8,
+   "noteNum": 4,
+   "pressCC": 8,
+   "locCC": 9,
+   "channel": 14
+  },
+  {
+   "id": "vSliderButton0",
+   "kind": "vslider",
+   "shape": "pill_track",
+   "cx_mm": 19.2,
+   "cy_mm": 151.8,
+   "w_mm": 11.9,
+   "h_mm": 48.0,
+   "noteNum": 20,
+   "pressCC": 60,
+   "locCC": 61,
+   "param": "wobble",
+   "min": 0.0,
+   "max": 10.0
+  },
+  {
+   "id": "vSliderButton1",
+   "kind": "vslider",
+   "shape": "pill_track",
+   "cx_mm": 38.0,
+   "cy_mm": 151.8,
+   "w_mm": 11.9,
+   "h_mm": 48.0,
+   "noteNum": 24,
+   "pressCC": 68,
+   "locCC": 69,
+   "param": "innerWobble",
+   "min": 0.0,
+   "max": 16.0
+  },
+  {
+   "id": "vSliderButton2",
+   "kind": "vslider",
+   "shape": "pill_track",
+   "cx_mm": 56.9,
+   "cy_mm": 151.8,
+   "w_mm": 11.9,
+   "h_mm": 48.0,
+   "noteNum": 28,
+   "pressCC": 76,
+   "locCC": 77,
+   "param": "releaseTime",
+   "min": 2.0,
+   "max": 6.0
+  },
+  {
+   "id": "vSliderButton3",
+   "kind": "vslider",
+   "shape": "pill_track",
+   "cx_mm": 75.7,
+   "cy_mm": 151.8,
+   "w_mm": 11.9,
+   "h_mm": 48.0,
+   "noteNum": 32,
+   "pressCC": 84,
+   "locCC": 85
+  }
+ ]
 }

@@ -1,6 +1,8 @@
-// ColliderPane tests — SPEC §6 scenario 2: "collider pane applies param=value"
-// and lights the slider proportionally. The pane emits through an onLit
-// callback, so it is exercised without three.js.
+// ColliderPane tests — SPEC §6 "The three.js board mirrors the live QuNeo LED
+// state". Lighting now derives from the raw cc/note state (not synth params):
+// sliders/rotaries light from their channel's locCC, pads/buttons light from
+// their channel's note on/off. The pane emits onLit(control, fraction) so it
+// stays renderer-free.
 
 import { test, assert, assertEqual } from './harness.js';
 import { normalizeLayout, indexById } from '../src/board.js';
@@ -13,10 +15,10 @@ const INLINE = {
   channel: 15,
   board: { w: 241, h: 185 },
   controls: [
-    { id: 'vSliderButton0', kind: 'vslider', cx_mm: 19.2, cy_mm: 151.8, pressCC: 60, locCC: 61, param: 'wobble', min: 0, max: 10 },
-    { id: 'vSliderButton1', kind: 'vslider', cx_mm: 38.0, cy_mm: 151.8, pressCC: 68, locCC: 69, param: 'innerWobble', min: 0, max: 16 },
-    { id: 'vSliderButton2', kind: 'vslider', cx_mm: 56.9, cy_mm: 151.8, pressCC: 76, locCC: 77, param: 'releaseTime', min: 2, max: 6 },
-    { id: 'vSliderButton3', kind: 'vslider', cx_mm: 75.7, cy_mm: 151.8, pressCC: 84, locCC: 85 },
+    { id: 'vSliderButton0', kind: 'vslider', shape: 'pill_track', cx_mm: 19.2, cy_mm: 151.8, w_mm: 11.9, h_mm: 48, locCC: 61 },
+    { id: 'padButton0', kind: 'pad', shape: 'rounded_square', cx_mm: 30, cy_mm: 30, w_mm: 22, h_mm: 22, noteNum: 0 },
+    { id: 'rotaryButton0', kind: 'rotary', shape: 'drum_circle', cx_mm: 90, cy_mm: 90, w_mm: 30, h_mm: 30, locCC: 1, channel: 14 },
+    { id: 'buttonButton9', kind: 'button', shape: 'up_down_arrows', cx_mm: 120, cy_mm: 30, w_mm: 10, h_mm: 10 },
   ],
 };
 
@@ -24,57 +26,71 @@ function makePane() {
   const controls = normalizeLayout(INLINE).controls;
   const calls = [];
   const pane = new ColliderPane(controls, { segments: 8 });
-  pane.onLit = (control, litSegments, fraction) => calls.push({ id: control.id, litSegments, fraction });
+  pane.onLit = (control, fraction) => calls.push({ id: control.id, fraction });
   return { pane, calls, byId: indexById(controls) };
 }
 
-test('apply lights a slider proportionally to its param value', () => {
+test('applyState lights every control, returning the control count', () => {
   const { pane, calls } = makePane();
-  assertEqual(pane.apply('wobble', 5.0), true, 'bound param applies');
-  assertEqual(calls.length, 1, 'one lit callback');
-  assertEqual(calls[0].id, 'vSliderButton0', 'correct control');
-  assertEqual(calls[0].litSegments, 4, '0.5 of 8 segments');
+  const applied = pane.applyState({ present: true, cc: {}, note: {} });
+  assertEqual(applied, 4, 'all four controls touched');
+  assertEqual(calls.length, 4, 'one callback per control');
 });
 
-test('apply honors the releaseTime lower bound as unlit', () => {
+test('applyState maps a slider value to a locCC fraction', () => {
   const { pane, calls } = makePane();
-  pane.apply('releaseTime', 2.0);
-  assertEqual(calls[0].litSegments, 0, 'releaseTime 2.0 -> 0 segments');
+  pane.applyState({ present: true, cc: { 15: { 61: 95 } }, note: {} });
+  const v0 = calls.find((c) => c.id === 'vSliderButton0');
+  assert(v0, 'vslider lit');
+  assertEqual(Math.abs(v0.fraction - 95 / 127) < 1e-9, true, 'fraction = 95/127');
 });
 
-test('apply lights full when a value hits the param max', () => {
+test('applyState lights a pad while its note is on, dark on release', () => {
   const { pane, calls } = makePane();
-  pane.apply('innerWobble', 16.0);
-  assertEqual(calls[0].litSegments, 8, 'innerWobble 16.0 -> all 8 segments');
+  pane.applyState({ present: true, cc: {}, note: { 15: { 0: true } } });
+  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, 1, 'pad lit on note-on');
+  calls.length = 0;
+  pane.applyState({ present: true, cc: {}, note: { 15: { 0: false } } });
+  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, 0, 'pad dark on note-off');
 });
 
-test('apply is a no-op for an unknown param', () => {
+test('applyState lights a rotary from its ch14 locCC, not ch15', () => {
   const { pane, calls } = makePane();
-  assertEqual(pane.apply('notAParam', 1.0), false, 'unknown param ignored');
-  assertEqual(calls.length, 0, 'no lit callback');
+  pane.applyState({ present: true, cc: { 14: { 1: 127 }, 15: { 1: 0 } }, note: {} });
+  const rot = calls.find((c) => c.id === 'rotaryButton0');
+  assertEqual(rot.fraction, 1, 'rotary reads ch14 locCC 1');
 });
 
-test('applyState lights every control in the state payload', () => {
+test('applyState leaves the unmapped button dark', () => {
   const { pane, calls } = makePane();
-  const applied = pane.applyState({ present: true, sliders: { wobble: 5.0, innerWobble: 8.0 } });
-  assertEqual(applied, 2, 'two bound params applied');
-  const litIds = calls.map((c) => c.id).sort();
-  assertEqual(litIds, ['vSliderButton0', 'vSliderButton1'], 'both controls lit');
+  pane.applyState({ present: true, cc: {}, note: { 15: { 100: true } } });
+  const btn = calls.find((c) => c.id === 'buttonButton9');
+  assertEqual(btn.fraction, 0, 'unmapped button stays dark');
 });
 
 test('applyState handles an absent board (present false)', () => {
   const { pane, calls } = makePane();
-  const applied = pane.applyState({ present: false, sliders: {} });
-  assertEqual(applied, 0, 'nothing to light');
-  assertEqual(calls.length, 0, 'no callbacks');
+  const applied = pane.applyState({ present: false, cc: {}, note: {} });
+  assertEqual(applied, 4, 'still emits a dark frame for every control');
+  assertEqual(calls.every((c) => c.fraction === 0), true, 'all dark');
 });
 
-test('getState parses the /api/collider payload', async () => {
-  const stub = stubFetch({ routes: { '/api/collider': { present: true, sliders: { wobble: 5.0 } } } });
+test('getState parses the /api/collider payload including cc and note', async () => {
+  const stub = stubFetch({
+    routes: {
+      '/api/collider': {
+        present: true,
+        sliders: { wobble: 5.0 },
+        cc: { 15: { 61: 95 } },
+        note: { 15: { 0: true } },
+      },
+    },
+  });
   try {
     const state = await getState();
     assertEqual(state.present, true, 'present flag');
-    assertEqual(state.sliders.wobble, 5.0, 'wobble value');
+    assertEqual(state.cc['15'][61], 95, 'cc value nested by channel');
+    assertEqual(state.note['15'][0], true, 'note on nested by channel');
   } finally {
     stub.restore();
   }
