@@ -4,9 +4,69 @@ Last updated: 2026-11-22
 
 ## Current state
 
-- Project is spec-only. No runtime code yet.
-- The §8 validating spike for D3 (SynthDef delivery) is COMPLETE and PASSED.
-- SPEC.md §8 risk #1 is now marked RESOLVED.
+- The bridge, the three.js board, and the full-board lit-state mirror are all
+  implemented, tested, and live. No longer spec-only.
+- **MILESTONE (2026-11-22):** the three.js board mirrors the physical QuNeo's
+  lit/unlit state across the full 38-control surface, driven by live CC/note
+  MIDI state from the bridge — not just the 3 synth-bound sliders. A pad pressed
+  on the real board lights the same pad on the model, in the same orientation
+  and brightness, and the state survives a bridge restart.
+- Backend: **59** pytest green. Frontend: **21** browser-harness tests green.
+
+## Milestone detail (full-board lit-state mirror)
+
+Prior to this, the bridge parsed only control-change events and tracked only the
+3 synth-bound vertical sliders. Now the watcher parses both CC and Note
+on/off lines and keeps raw control state for the whole surface, so unmapped
+controls light too.
+
+- `mapping.json` carries a 30-control MIDI inventory (16 pads + 4 hSliders +
+  4 vSliders + 1 lSlider + 3 lit buttons + 2 rotaries) from `BasicSC_QuNeo.scd`.
+  `client/LAYOUT.json` is regenerated as the 38-control merge of editor geometry
+  + those MIDI bindings (per-control `channel`, so ch14 rotaries do not collide
+  with ch15 pad `xCC`/`yCC`).
+- `midi.py` keeps CC and note state **keyed by MIDI channel** — a pad `xCC`
+  (ch15) and a rotary `locCC` (ch14) may share a controller number, as may a pad
+  note (ch15) and a rotary note (ch14). A flat `{number: value}` map would merge
+  distinct controls.
+- `/api/collider` now exposes `{present, sliders, cc, note}`. `cc` and `note`
+  are per-channel maps; `sliders` (synth params) stays for bubble spawning, so
+  the endpoint is backward compatible.
+- Frontend derives lit state from raw `cc`/`note`, not synth params:
+  - vSlider fills toward the TOP (0 = dark, max = full).
+  - hSlider / lSlider fills toward the RIGHT.
+  - pad lights its corner from latched x/y and stays lit after release, button latches.
+  - rotary renders a ring with a position indicator at the value's angle.
+- **Unmapped buttons (8 of 11).** `BasicSC_QuNeo` binds notes/CCs to only three
+  physical buttons. The other eight render in the model but carry no
+  `noteNum`/`pressCC`, so they stay dark until a note arrives on their channel:
+  `buttonButton3` triangle-right, `buttonButton4..7` left-right arrows,
+  `buttonButton8` rhombus, `buttonButton9..10` up-down arrows.
+- **State persistence:** the QuNeo emits nothing on ALSA subscribe, so a bridge
+  restart used to blank every control back to dark. `MidiWatcher` now accepts an
+  optional `state_file`; `serve()` defaults it to
+  `$XDG_STATE_HOME/super-quneo-collider/state.json`, reloads it on boot, and
+  atomically re-saves on every CC/note mutation (temp file + `os.replace`). A
+  missing or corrupt file degrades to an empty board, never a crash.
+
+## Pad quadrant lighting ("4×4×4" surface) — landed 2026-11-22
+
+Each physical pad now resolves its press into a corner, not a single binary
+face. `board.js` exposes `padQuadrant(control, cc)` which reads the pad's
+`xCC`/`yCC` (already tracked per-channel in `/api/collider`) and folds them into
+one of four quadrants — 16 pads × 4 = 64 touch points. `render.js` builds each
+pad as four quadrant meshes and `setLit` lights exactly one corner; `pane.js`
+routes pads through `padQuadrant`. Backend capture and mapping were already in
+place, so this was a frontend-only change.
+
+Convention (QuNeo manual): X-Axis low→high is left→right, Y-Axis low→high is
+bottom→top. Quadrant index: 0 = bottom-left, 1 = bottom-right, 2 = top-left,
+3 = top-right. The QuNeo latches x/y (`outDmXReturn`/`outDmYReturn` = -1 in the
+preset), so the lit corner persists after the finger lifts — the pad stays lit
+at its last location independent of note on/off; `null` (dark) only until x/y
+is first reported for that pad.
+
+No remaining work is outstanding from this milestone.
 
 ## Spike result (D3): PASSED on 2026-11-22
 
@@ -78,14 +138,15 @@ addr.sendMsg("/d_recv", d.asBytes);   // Int8Array -> OSC blob ('b')
    The 35 unit tests pass only because they do not exercise a real pyliblo3 round-trip.
    → When porting `osc_service.py` to this project, use `cb(path, args, types, src)`.
 
-## Port action items (for the real sc.py / osc_service.py port)
+## Port status (the real sc.py / osc_service.py port)
 
-- [ ] Use `cb(path, args, types, src)` — fix the inherited callback order.
-- [ ] Deliver `bubbles` via a one-shot `sclang` subprocess at startup (spawn, then
-      `wait()`), exactly as the spike's `deliver_def.scd`.
-- [ ] Python control plane via pyliblo3: `/s_new` on pad press, `/n_set` on CC change,
-      `/s_get` for the D3-spec defaults check.
-- [ ] Do not attempt python `/d_recv`; it cannot work on pyliblo3.
+The port that the spike gated is DONE and shipped:
+
+- [x] Use `cb(path, args, types, src)` — fixed the inherited callback order.
+- [x] Deliver `bubbles` via a one-shot `sclang` subprocess at startup (`sc.py`).
+- [x] Python control plane via pyliblo3: `/s_new` on trigger, `/n_set` mapping,
+      `/s_get`/`numDefs` for the D3 defaults check.
+- [x] No python `/d_recv` anywhere — it cannot work on pyliblo3.
 
 ## Spike scratch (throwaway, /tmp)
 
@@ -93,11 +154,13 @@ addr.sendMsg("/d_recv", d.asBytes);   // Int8Array -> OSC blob ('b')
 - `/tmp/spike_roundtrip.py` — the working pyliblo3 `/s_new`/`/n_set`/`/s_get` round-trip.
 - `/tmp/asbytes_probe.scd`, `/tmp/sc_min.scd` — one-shot invocation + asBytes probes.
 - `/tmp/synthdefs/bubbles.scsyndef` — compiled def (1113 bytes, `SCgf` magic).
-- `/tmp/scsynth.log` — scsynth boot log (still running in background this session).
+- `/tmp/scsynth.log` — scsynth boot log.
 
 ## Environment facts
 
 - scsynth / sclang both 3.13.0 at `/usr/bin/scsynth` and `/usr/bin/sclang`.
-- toolchain venv: `/home/rjodouin/Documents/git/queneo-editor/.venv` (CPython 3.14.4,
-  pyliblo3 0.17.0). Rebuilt after the OS upgrade to 3.14.
+- toolchain venv: `.venv` in this project (CPython 3.14, pyliblo3 0.17.0); the
+  queneo-editor venv remains at `/home/rjodouin/Documents/git/queneo-editor/.venv`.
 - QuNeo ALSA client "QuNeo MIDI 1" resolves by NAME, never by number.
+- Frontend is zero-build: three.module.js vendored, browser-harness tests run
+  from `client/tests/index.html`.

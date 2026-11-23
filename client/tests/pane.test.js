@@ -16,7 +16,7 @@ const INLINE = {
   board: { w: 241, h: 185 },
   controls: [
     { id: 'vSliderButton0', kind: 'vslider', shape: 'pill_track', cx_mm: 19.2, cy_mm: 151.8, w_mm: 11.9, h_mm: 48, locCC: 61 },
-    { id: 'padButton0', kind: 'pad', shape: 'rounded_square', cx_mm: 30, cy_mm: 30, w_mm: 22, h_mm: 22, noteNum: 0 },
+    { id: 'padButton0', kind: 'pad', shape: 'rounded_square', cx_mm: 30, cy_mm: 30, w_mm: 22, h_mm: 22, noteNum: 0, xCC: 1, yCC: 2 },
     { id: 'rotaryButton0', kind: 'rotary', shape: 'drum_circle', cx_mm: 90, cy_mm: 90, w_mm: 30, h_mm: 30, locCC: 1, channel: 14 },
     { id: 'buttonButton9', kind: 'button', shape: 'up_down_arrows', cx_mm: 120, cy_mm: 30, w_mm: 10, h_mm: 10 },
   ],
@@ -45,13 +45,17 @@ test('applyState maps a slider value to a locCC fraction', () => {
   assertEqual(Math.abs(v0.fraction - 95 / 127) < 1e-9, true, 'fraction = 95/127');
 });
 
-test('applyState lights a pad while its note is on, dark on release', () => {
+test('applyState lights a pad quadrant from latched x/y (stays lit on release)', () => {
   const { pane, calls } = makePane();
-  pane.applyState({ present: true, cc: {}, note: { 15: { 0: true } } });
-  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, 1, 'pad lit on note-on');
+  pane.applyState({ present: true, cc: { 15: { 1: 127, 2: 127 } }, note: { 15: { 0: true } } });
+  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, 3, 'pad lights top-right (quadrant 3)');
   calls.length = 0;
-  pane.applyState({ present: true, cc: {}, note: { 15: { 0: false } } });
-  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, 0, 'pad dark on note-off');
+  // note-off: x/y latches on the real board, so the pad stays lit
+  pane.applyState({ present: true, cc: { 15: { 1: 127, 2: 127 } }, note: { 15: { 0: false } } });
+  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, 3, 'pad stays lit top-right on note-off');
+  calls.length = 0;
+  pane.applyState({ present: true, cc: {}, note: {} });
+  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, null, 'pad dark only before any x/y hit');
 });
 
 test('applyState lights a rotary from its ch14 locCC, not ch15', () => {
@@ -72,7 +76,10 @@ test('applyState handles an absent board (present false)', () => {
   const { pane, calls } = makePane();
   const applied = pane.applyState({ present: false, cc: {}, note: {} });
   assertEqual(applied, 4, 'still emits a dark frame for every control');
-  assertEqual(calls.every((c) => c.fraction === 0), true, 'all dark');
+  const v0 = calls.find((c) => c.id === 'vSliderButton0');
+  const pad = calls.find((c) => c.id === 'padButton0');
+  assertEqual(v0.fraction, 0, 'slider dark');
+  assertEqual(pad.fraction, null, 'pad dark');
 });
 
 test('getState parses the /api/collider payload including cc and note', async () => {

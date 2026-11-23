@@ -1,10 +1,13 @@
 // Renderer for the collider board — three.js, no build step. Builds a dark
 // board slab plus one light handle per physical control, and lets the caller
-// drive each control's lit fraction via light.setLit(0..1). Lighting direction:
+// drive each control's lit state via light.setLit(value), where value is a
+// 0..1 fraction for sliders/rotaries, a quadrant 0..3 (or null for dark) for
+// pads, and 0/1 for buttons. Lighting direction:
 //   vsliders fill bottom-up (toward the top of the board),
 //   hsliders/lsliders fill left-to-right (toward the right),
-//   pads/buttons are a single binary face,
-//   rotaries are a RING of segments with one position indicator lit.
+//   pads light a single corner quadrant (0=bottom-left .. 3=top-right),
+//   rotaries are a RING of segments with one position indicator lit,
+//   starting at north (0 degrees / 12 o'clock) and advancing clockwise.
 // Kept separate from the pane/model so the pure logic stays renderer-free.
 
 import * as THREE from '../vendor/three.module.js';
@@ -110,6 +113,7 @@ function buildLight(control) {
     case 'rotary':
       return buildRing(control);
     case 'pad':
+      return buildQuadPad(control);
     case 'button':
     default:
       return buildBinary(control);
@@ -158,7 +162,9 @@ function buildRing(control) {
   const seg = (Math.min(control.w_mm, control.h_mm) * 0.18);
 
   for (let i = 0; i < RING; i++) {
-    const angle = (i / RING) * Math.PI * 2;
+    // 0 degrees = north (top of the board, -z). three.js angle 0 points to
+    // +x (east / 3pm), so offset by -90deg to put segment 0 at 12 o'clock.
+    const angle = (i / RING) * Math.PI * 2 - Math.PI / 2;
     const mesh = new THREE.Mesh(new THREE.BoxGeometry(seg, 0.6, seg), freshMat());
     mesh.position.set(
       control.world.x + r * Math.cos(angle),
@@ -179,7 +185,40 @@ function buildRing(control) {
   };
 }
 
-/** A pad or button as a single flat face, binary lit while fraction > 0. */
+/** A pad as four quadrant faces, one per touch corner. meshes[] is indexed
+ *  [0]=bottom-left, [1]=bottom-right, [2]=top-left, [3]=top-right in world
+ *  space (+z is the bottom edge, -x is the left edge). setLit(quadrant) lights
+ *  exactly that corner; null leaves the whole pad dark.
+ */
+function buildQuadPad(control) {
+  const qw = control.w_mm / 2 - 1.5; // thin gap between quadrants
+  const qh = control.h_mm / 2 - 1.5;
+  const cx = control.world.x;
+  const cz = control.world.z;
+  const ox = control.w_mm / 4;
+  const oz = control.h_mm / 4;
+  const offsets = [
+    [-ox, oz],  // bottom-left
+    [ox, oz],   // bottom-right
+    [-ox, -oz], // top-left
+    [ox, -oz],  // top-right
+  ];
+  const meshes = offsets.map(([dx, dz]) => {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(qw, 0.6, qh), freshMat());
+    mesh.position.set(cx + dx, Y_TOP, cz + dz);
+    return mesh;
+  });
+
+  return {
+    kind: control.kind,
+    meshes,
+    setLit(quadrant) {
+      meshes.forEach((m, i) => setMeshLit(m, i === quadrant));
+    },
+  };
+}
+
+/** A button as a single flat face, binary lit while fraction > 0. */
 function buildBinary(control) {
   const mesh = new THREE.Mesh(
     new THREE.BoxGeometry(control.w_mm, 0.6, control.h_mm),

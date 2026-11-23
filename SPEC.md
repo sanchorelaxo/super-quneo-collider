@@ -9,7 +9,9 @@ approval. Nothing in `src/` is implemented until this document is reviewed and a
 
 A Keith McMillen QuNeo slider, touched on the physical board, changes the sound of a
 running SuperCollider "bubbles" synth in real time, while a three.js model of that same
-board lights up to show the change. The whole loop runs through a local Python bridge.
+board mirrors its lit/unlit state across the full control surface (pads, sliders,
+buttons, rotaries), so the model is a live picture of the physical board, not just a
+readout of the three bound sliders. The whole loop runs through a local Python bridge.
 
 What we already have, tested and working:
 
@@ -169,8 +171,12 @@ SynthDef("bubbles", { arg out=0, wobble=0.4, innerWobble=8, releaseTime=4;
 ```
 
 The full BasicSC table (pads, horizontal sliders, long sliders, buttons, circles) is the
-appendix at the bottom; it feeds D4 so every board control carries a quark-compatible
-note/CC, but only the three vertical sliders above are bound to synth params.
+appendix at the bottom. It is realized in `mapping.json` as a 30-control MIDI inventory
+(16 pads + 4 hSliders + 4 vSliders + 1 lSlider + 3 lit buttons + 2 rotaries), each
+carrying its `channel`/`noteNum`/`pressCC`/`locCC` (and `xCC`/`yCC`/`widthCC` where the
+kind needs them). The watcher tracks live CC and note state for every control, keyed by
+MIDI channel so the channel-14 rotaries do not collide with channel-15 pad `xCC`/`yCC`.
+Only the three vertical sliders above are bound to synth params.
 
 ---
 
@@ -292,6 +298,8 @@ Scenario: the collider state endpoint
   When the client GETs /api/collider
   Then the response is JSON with a boolean "present"
   And a "sliders" object keyed by parameter name
+  And a "cc" object of raw CC values keyed by channel then CC number
+  And a "note" object of note on/off keyed by channel then note number
 
 Scenario Outline: a slider value appears in the API
   Given watcher state has <param> = <value>
@@ -329,6 +337,47 @@ Scenario Outline: a value lights the slider proportionally
     | innerWobble | 16.0  | 1.0         |
     | releaseTime | 2.0   | 0.0         |
 
+### Feature: The three.js board mirrors the full control surface
+
+Scenario Outline: a slider lights along its fill direction
+  Given the board model is rendered
+  When the collider applies channel <channel> locCC <cc> = <value>
+  Then the control's lit fraction is <fraction>, filled toward <direction>
+
+  Examples:
+    | channel | cc | value | fraction | direction |
+    | 15      | 61 | 127   | 1.0      | top       |
+    | 15      | 61 | 0     | 0.0      | top       |
+    | 15      | 93 | 64    | ~0.5     | right     |
+    | 15      | 49 | 64    | ~0.5     | right     |
+    | 14      | 1  | 32    | ~0.25    | ring      |
+
+Scenario Outline: a pad lights its corner and stays lit after release (x/y latches)
+  Given the board model is rendered
+  When the pad's xCC reads <x> and its yCC reads <y>
+  Then the pad with noteNum <note> lights quadrant <quadrant>
+  When channel 15 note <note> turns off
+  Then the pad with noteNum <note> still lights quadrant <quadrant>
+
+  Examples:
+    | note | x   | y   | quadrant |
+    | 0    | 0   | 0   | 0        |
+    | 0    | 127 | 0   | 1        |
+    | 0    | 0   | 127 | 2        |
+    | 0    | 127 | 127 | 3        |
+    | 15   | 127 | 127 | 3        |
+
+Scenario: a pad stays dark until its x/y location is first reported
+  Given the board model is rendered
+  When channel 15 note 0 turns on
+  And no xCC or yCC has been reported for that pad
+  Then the pad with noteNum 0 goes dark
+
+Scenario: channel 14 and channel 15 do not collide
+  Given the cc map holds channel 15 CC 1 = 100 (pad xCC)
+  And the cc map holds channel 14 CC 1 = 10 (rotary locCC)
+  Then padButton0 and rotaryButton0 light from their own channel's value
+
 ### Feature: The bubbles base test (end to end)
 
   Scenario: motion on the real QuNeo changes the sound and the board
@@ -358,6 +407,10 @@ Scenario Outline: a value lights the slider proportionally
 - The hardware path (section 6, last feature) is exercised manually by the user, using
   `quneo-rig` to hold the board and camera, once the board position and camera mount
   are set up.
+- The board mirror is full-surface: the bridge tracks CC and note state per MIDI
+  channel, `/api/collider` exposes `cc` and `note` alongside `sliders`, and the
+  three.js model lights every control type (vSlider fills to the top, h/lSlider to the
+  right, pads only while pressed, buttons latched, rotaries on a ring).
 - Preset flashing is test-only: it is driven by `tests/helpers/quneo_flash.py`, which
   boots queneo-editor's editor server; the runtime bridge never imports, starts, or
   invokes it.
@@ -395,6 +448,17 @@ Drum pads (each: noteNum, pressCC, xCC, yCC, channel 15):
 createDrumPad(00, 00, 00, 01, 02, 15)  ... createDrumPad(15, 15, 45, 46, 47, 15)
 ```
 (note = index, pressCC = index, xCC = index+1, yCC = index+2)
+
+Each pad reports a continuous `xCC`/`yCC` position in addition to note on/off, so a
+pad resolves its press into four corners (16 pads × 4 = 64 touch points). X-Axis runs
+low→high left→right and Y-Axis low→high bottom→top (QuNeo manual); `padQuadrant` in
+`board.js` folds the two axes into a corner index — 0 = bottom-left, 1 = bottom-right,
+2 = top-left, 3 = top-right — and `render.js` lights exactly that quadrant mesh from
+the latched x/y location. The QuNeo latches x/y (`outDmXReturn`/`outDmYReturn` = -1
+in the preset), so the corner persists after the finger lifts and the pad stays lit
+independent of note on/off; it is dark only before x/y is first reported. Backend
+`xCC`/`yCC` tracking and the per-pad `mapping.json` bindings were already in place, so
+this was a frontend-only change.
 
 Horizontal sliders (noteNum, pressCC, locCC, channel 15):
 
@@ -434,6 +498,11 @@ Buttons (noteNum, pressCC, channel 15):
 ```
 createButton(00, 36, 124, 15)  createButton(01, 37, 125, 15)  createButton(02, 38, 126, 15)
 ```
+
+Only those three buttons are MIDI-mapped. The QuNeo carries eight further physical
+buttons that have no quark binding and therefore stay dark in the model unless a note
+arrives on their channel: triangle-right, four left-right arrows, rhombus, and two
+up-down arrows (`buttonButton3..10`).
 
 Circle controls (noteNum, pressCC, locCC, channel 14):
 

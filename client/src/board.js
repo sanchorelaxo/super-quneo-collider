@@ -9,12 +9,13 @@
 //
 // Lighting is derived from raw hardware state, not synth params:
 //   - a slider or rotary lights from its channel's locCC value / 127
-//   - a pad or button lights while its channel's note is on
+//   - a pad lights one of four corner quadrants from its xCC/yCC location
+//   - a button lights while its channel's note is on
 // Channel is per-control so a ch15 pad xCC/yCC never collides with a ch14
 // rotary locCC that happens to share the same number.
 
 const CONTINUOUS_KINDS = new Set(['vslider', 'hslider', 'lslider', 'rotary']);
-const BINARY_KINDS = new Set(['pad', 'button']);
+const BINARY_KINDS = new Set(['button']);
 
 export async function loadLayout(url = './LAYOUT.json') {
   const res = await fetch(url, { cache: 'no-cache' });
@@ -77,8 +78,9 @@ export function ccFraction(value) {
  * `note` is `{ channel: { noteNumber: bool } }`.
  *
  * Continuous controls (sliders/rotaries) read their locCC; binary controls
- * (pads/buttons) light while their note is on. Anything without a binding
- * (e.g. an unmapped button) returns 0 and stays dark.
+ * (buttons) light while their note is on. Pads are handled separately by
+ * padQuadrant(). Anything without a binding (e.g. an unmapped button)
+ * returns 0 and stays dark.
  */
 export function controlFraction(control, cc, note) {
   const ch = control.channel;
@@ -91,4 +93,27 @@ export function controlFraction(control, cc, note) {
     return chNote[control.noteNum] === true ? 1 : 0;
   }
   return 0;
+}
+
+/**
+ * The quadrant of a pad a press lights, from channel-keyed CC state.
+ *
+ * A pad exposes four touch corners resolved from its x/y location CCs (QuNeo
+ * manual: X-Axis low→high is left→right, Y-Axis low→high is bottom→top).
+ * Quadrant index: 0 = bottom-left, 1 = bottom-right, 2 = top-left,
+ * 3 = top-right. The QuNeo latches x/y (outDmX/YReturn = -1 in the preset),
+ * so the corner persists after the finger lifts: the pad stays lit at its
+ * last location independent of note on/off. It is dark (null) only before
+ * both xCC and yCC have been reported for that pad.
+ */
+export function padQuadrant(control, cc) {
+  const ch = control.channel;
+  const chCC = (cc && cc[ch]) || {};
+  if (control.xCC == null || control.yCC == null) return null;
+  const x = chCC[control.xCC];
+  const y = chCC[control.yCC];
+  if (x === undefined || y === undefined) return null; // no latched location yet
+  const col = x > 63 ? 1 : 0; // xCC high = right half
+  const row = y > 63 ? 1 : 0; // yCC high = top half
+  return row * 2 + col;
 }

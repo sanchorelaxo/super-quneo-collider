@@ -1,9 +1,11 @@
 // Renderer tests — run against real WebGL in the browser harness. buildBoard
-// now builds a light for every control kind (vslider/hslider/lslider ladders,
-// rotary ring, pad/button single face). Each light exposes setLit(fraction),
-// so the test can pin lighting direction without a running animate() loop.
-// Direction contract: sliders fill from their LOW end — vsliders bottom-up
-// (toward the top of the board), hsliders left-to-right (toward the right).
+// builds a light for every control kind (vslider/hslider/lslider ladders,
+// rotary ring, pad four-quadrant faces, button single face). Each light
+// exposes setLit(value): sliders/rotaries take a 0..1 fraction, buttons take
+// 0/1, pads take a quadrant 0..3 (or null for dark). The test can pin lighting
+// direction without a running animate() loop. Direction contract: sliders fill
+// from their LOW end — vsliders bottom-up (toward the top of the board),
+// hsliders left-to-right (toward the right).
 
 import { test, assert, assertEqual } from './harness.js';
 import { loadLayout } from '../src/board.js';
@@ -77,19 +79,26 @@ test('a hslider ladder fills left-to-right (toward the right)', async () => {
   }
 });
 
-test('a pad is a single binary face lit only while on', async () => {
+test('a pad is four quadrant faces lit one at a time', async () => {
   const layout = await loadLayout('../LAYOUT.json');
   const container = makeContainer();
   const board = buildBoard(layout, container);
   try {
     const light = board.lights.get('padButton0');
-    assertEqual(light.meshes.length, 1, 'single pad face');
-    light.setLit(0);
-    assert(!lit(light.meshes[0]), 'off -> dark');
-    light.setLit(1);
-    assert(lit(light.meshes[0]), 'on -> lit');
-    light.setLit(0);
-    assert(!lit(light.meshes[0]), 'back to dark');
+    assertEqual(light.meshes.length, 4, 'four quadrant faces');
+    // world convention: +z is the bottom edge, -x is the left edge, so
+    // meshes[0] (bottom-left) sits low-right of meshes[3] (top-right).
+    assert(light.meshes[0].position.z > light.meshes[2].position.z, 'bottom row is +z');
+    assert(light.meshes[0].position.x < light.meshes[1].position.x, 'left column is -x');
+    light.setLit(null); // note off
+    assertEqual(light.meshes.filter(lit).length, 0, 'all dark when null');
+    light.setLit(0); // bottom-left
+    assertEqual(light.meshes.filter(lit).length, 1, 'one quadrant lit');
+    assert(lit(light.meshes[0]), 'quadrant 0 (bottom-left) lit');
+    assert(!lit(light.meshes[3]), 'top-right stays dark');
+    light.setLit(3); // top-right
+    assert(lit(light.meshes[3]), 'quadrant 3 (top-right) lit');
+    assert(!lit(light.meshes[0]), 'bottom-left now dark');
   } finally {
     board.dispose();
     container.remove();
@@ -103,6 +112,10 @@ test('a rotary renders a RING of segments with one position indicator', async ()
   try {
     const light = board.lights.get('rotaryButton0');
     assertEqual(light.meshes.length, RING, 'RING segments');
+    // 0 degrees must sit at north (the top of the board = minimum world z),
+    // not east (3pm). Segment 0 is the unique topmost one after the fix.
+    const zs = light.meshes.map((m) => m.position.z);
+    assert(light.meshes[0].position.z === Math.min(...zs), '0 degrees sits at the north/top segment');
     light.setLit(0);
     assertEqual(light.meshes.filter(lit).length, 1, 'one segment lit at min');
     assert(lit(light.meshes[0]), 'min value sits on the first segment');

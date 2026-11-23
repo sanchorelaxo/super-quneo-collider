@@ -11,6 +11,7 @@ import {
   indexById,
   ccFraction,
   controlFraction,
+  padQuadrant,
 } from '../src/board.js';
 
 const INLINE = {
@@ -71,11 +72,45 @@ test('controlFraction: rotary ch14 ignores the ch15 cc that shares its number', 
   assertEqual(controlFraction(rotary, cc, {}), 1, 'reads ch14 locCC 1, not ch15 cc 1');
 });
 
-test('controlFraction: a pad lights while its note is on, else dark', () => {
+test('padQuadrant: stays lit after the note goes off (x/y latches)', () => {
   const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
-  assertEqual(controlFraction(pad, {}, { 15: { 0: true } }), 1, 'note on -> lit');
-  assertEqual(controlFraction(pad, {}, { 15: { 0: false } }), 0, 'note off -> dark');
-  assertEqual(controlFraction(pad, {}, {}), 0, 'no note -> dark');
+  // The QuNeo latches x/y (Return = -1), so the corner persists after release.
+  assertEqual(padQuadrant(pad, { 15: { 1: 127, 2: 127 } }), 3, 'x/y latched -> still top-right');
+  assertEqual(padQuadrant(pad, { 15: { 1: 0, 2: 0 } }), 0, 'x/y latched -> still bottom-left');
+});
+
+test('padQuadrant: dark (null) only before x/y has been reported', () => {
+  const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
+  assertEqual(padQuadrant(pad, {}), null, 'no cc -> dark');
+  assertEqual(padQuadrant(pad, { 15: {} }), null, 'no x/y on channel -> dark');
+  assertEqual(padQuadrant(pad, { 15: { 1: 127 } }), null, 'x only, no y -> dark');
+  assertEqual(padQuadrant(pad, { 15: { 2: 127 } }), null, 'y only, no x -> dark');
+});
+
+test('padQuadrant: xCC left + yCC bottom resolves to bottom-left (0)', () => {
+  const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
+  assertEqual(padQuadrant(pad, { 15: { 1: 0, 2: 0 } }), 0, 'x low + y low -> 0');
+});
+
+test('padQuadrant: xCC right + yCC bottom resolves to bottom-right (1)', () => {
+  const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
+  assertEqual(padQuadrant(pad, { 15: { 1: 127, 2: 0 } }), 1, 'x high + y low -> 1');
+});
+
+test('padQuadrant: xCC left + yCC top resolves to top-left (2)', () => {
+  const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
+  assertEqual(padQuadrant(pad, { 15: { 1: 0, 2: 127 } }), 2, 'x low + y high -> 2');
+});
+
+test('padQuadrant: xCC right + yCC top resolves to top-right (3)', () => {
+  const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
+  assertEqual(padQuadrant(pad, { 15: { 1: 127, 2: 127 } }), 3, 'x high + y high -> 3');
+});
+
+test('padQuadrant reads its own channel (ch15 xCC/yCC, not ch14)', () => {
+  const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
+  // ch14 rotary locCC 1 must not leak into the ch15 pad xCC
+  assertEqual(padQuadrant(pad, { 15: { 1: 127, 2: 127 }, 14: { 1: 0 } }), 3, 'ch15 top-right wins');
 });
 
 test('controlFraction: an unmapped button is always dark', () => {

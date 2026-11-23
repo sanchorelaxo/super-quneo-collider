@@ -1,10 +1,11 @@
 // ColliderPane — SPEC §6 "collider pane". Maps the bridge's raw cc/note state
-// (/api/collider) onto every board control's lit fraction and emits it through
-// `onLit(control, fraction)`. Fraction is 0..1: continuous controls derive it
-// from their channel's locCC, pads/buttons from their channel's note on/off.
-// The pane carries no three.js dependency; the renderer subscribes via onLit.
+// (/api/collider) onto every board control's lit value and emits it through
+// `onLit(control, value)`. value is 0..1 for sliders/rotaries (from locCC),
+// 0/1 for buttons (from note on/off), and a quadrant 0..3 or null for pads
+// (from xCC/yCC). The pane carries no three.js dependency; the renderer
+// subscribes via onLit.
 
-import { controlFraction } from './board.js';
+import { controlFraction, padQuadrant } from './board.js';
 
 export class ColliderPane {
   /**
@@ -14,7 +15,7 @@ export class ColliderPane {
   constructor(controls, { segments = 8 } = {}) {
     this.controls = controls;
     this.segments = segments;
-    this.onLit = null; // (control, fraction) => void
+    this.onLit = null; // (control, value) => void
   }
 
   /**
@@ -26,8 +27,10 @@ export class ColliderPane {
     const note = (state && state.note) || {};
     let applied = 0;
     for (const control of this.controls) {
-      const fraction = controlFraction(control, cc, note);
-      if (this.onLit) this.onLit(control, fraction);
+      const value = control.kind === 'pad'
+        ? padQuadrant(control, cc)
+        : controlFraction(control, cc, note);
+      if (this.onLit) this.onLit(control, value);
       applied++;
     }
     return applied;
