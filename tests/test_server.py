@@ -648,6 +648,33 @@ def test_gated_note_spawns_on_press_and_gates_off_on_release():
     assert ("set_param", node, "gate", 1) in app.sc.calls
 
 
+def test_gated_note_slider_move_shapes_but_does_not_start_a_voice():
+    # A note-onset entry's voice exists only while a pad is held (SPEC §9.7:
+    # hoover "sounds only while a pad is held"). Moving its bound slider must
+    # shape the next note but never start a drone on its own.
+    app = make_app(active="hoover")
+    app.start()
+    app.on_cc(61, 90)  # vSlider0 -> freq, with no pad down
+    assert app.sc.spawns == []
+    assert app.sc.params == []
+    assert app.status()["sliders"]["freq"] != 440  # shaped, ready for the next note
+
+
+def test_gated_note_slider_sweep_retunes_the_held_voice():
+    # While a pad is held the note-onset voice lives; sweeping vSlider0 retunes
+    # that voice (SPEC §9.7: "vSlider0 sweeps pitch") rather than stacking a new
+    # one.  This is the sibling of the no-spawn test above: the guard must stop
+    # a fresh spawn, not the retune of an already-sounding voice.
+    app = make_app(active="hoover")
+    app.start()
+    app.on_note(5, True)
+    node = app.sc.spawns[0][1]
+    app.on_cc(61, 90)
+    assert len(app.sc.spawns) == 1
+    assert app.sc.params[-1][0] == node
+    assert app.sc.params[-1][1]["freq"] != 440
+
+
 def test_drone_starts_on_select_and_fades_on_deselect():
     app = make_app(active="bubbles")
     app.start()

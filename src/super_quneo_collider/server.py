@@ -117,8 +117,12 @@ class ColliderApp:
             return
         self.sliders[b["param"]] = scale_value(raw, b["min"], b["max"], b["curve"])
         # A oneshot's reserved slider only shapes the next hit, so moving it
-        # must not fire one (the corner/note does).
+        # must not fire one (the corner/note does).  A note-onset entry's voice
+        # exists only while its pad is held, so a slider move may shape a held
+        # voice but must never start one on its own (the pad's note does).
         if self.gesture != "oneshot":
+            if self.onset == "note" and self._live(self.active) is None:
+                return
             self._trigger()
 
     def on_note(self, note, on, channel=None) -> None:
