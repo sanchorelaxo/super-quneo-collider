@@ -135,7 +135,7 @@ class FakeProc:
         return -15 if self._dead else None
 
 
-def make_watcher(lines=(), clients=QUEO_CLIENTS, tmp_path=None, close_writer=False, on_event=None, channels=15):
+def make_watcher(lines=(), clients=QUEO_CLIENTS, tmp_path=None, close_writer=False, on_event=None, channels=15, state_file=None):
     clients_path = write_clients(tmp_path, clients)
     spawned = []
 
@@ -149,6 +149,7 @@ def make_watcher(lines=(), clients=QUEO_CLIENTS, tmp_path=None, close_writer=Fal
         spawn=fake_spawn,
         on_event=on_event,
         channels=channels,
+        state_file=state_file,
     )
     return watcher, spawned
 
@@ -255,3 +256,41 @@ class TestWatcherState:
             lambda: watcher.state()["note"].get(14, {}).get(0) is True
             and watcher.state()["note"].get(15, {}).get(0) is True
         )
+
+
+class TestPersistence:
+    def test_reloads_cc_and_note_from_state_file(self, tmp_path):
+        state_file = tmp_path / "quneo-state.json"
+        first, _ = make_watcher(
+            lines=[
+                " 24:0   Control change         15, controller 61, value 64",
+                " 24:0   Note on                14, note 0, velocity 100",
+            ],
+            tmp_path=tmp_path,
+            channels={14, 15},
+            state_file=state_file,
+        )
+        first.tick()
+        # Once the value is visible in state(), the save that ran under the same
+        # lock has already hit disk, so a brand-new watcher must see it.
+        assert wait_for(lambda: first.state()["cc"].get(15, {}).get(61) == 64)
+        assert state_file.exists()
+
+        second, _ = make_watcher(tmp_path=tmp_path, channels={14, 15}, state_file=state_file)
+        assert second.state()["cc"] == {15: {61: 64}}
+        assert second.state()["note"] == {14: {0: True}}
+
+    def test_load_tolerates_a_missing_state_file(self, tmp_path):
+        watcher, _ = make_watcher(
+            tmp_path=tmp_path,
+            state_file=tmp_path / "does-not-exist.json",
+        )
+        assert watcher.state()["cc"] == {}
+        assert watcher.state()["note"] == {}
+
+    def test_load_tolerates_a_corrupt_state_file(self, tmp_path):
+        state_file = tmp_path / "quneo-state.json"
+        state_file.write_text("{ this is not json")
+        watcher, _ = make_watcher(tmp_path=tmp_path, state_file=state_file)
+        assert watcher.state()["cc"] == {}
+        assert watcher.state()["note"] == {}

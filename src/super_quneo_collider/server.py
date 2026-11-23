@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import mimetypes
+import os
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
@@ -81,7 +82,11 @@ def serve(config=None) -> None:
     def _on_cc(cc: int, raw: int) -> None:
         app.on_cc(cc, raw)
 
-    midi = MidiWatcher(channels=channels(mapping), on_event=_on_cc)
+    midi = MidiWatcher(
+        channels=channels(mapping),
+        on_event=_on_cc,
+        state_file=config.get("state_file") or _default_state_file(),
+    )
     sc = ScServer(host=host, port=port)
     app = ColliderApp(mapping=mapping, midi=midi, sc=sc, node=node)
     app.start()
@@ -91,6 +96,11 @@ def serve(config=None) -> None:
     finally:
         app.sc.stop()
         app.midi.stop()
+
+
+def _default_state_file() -> Path:
+    base = os.environ.get("XDG_STATE_HOME") or str(Path.home() / ".local" / "state")
+    return Path(base) / "super-quneo-collider" / "state.json"
 
 
 def _guess_type(path: str) -> str:

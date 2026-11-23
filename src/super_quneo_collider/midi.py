@@ -17,6 +17,7 @@ and the watcher drops the ones on a different channel.
 """
 from __future__ import annotations
 
+import json
 import os
 import re
 import signal
@@ -148,6 +149,7 @@ class MidiWatcher:
         clock=time.monotonic,
         channels: int | set[int] = 15,
         on_event=None,
+        state_file: str | Path | None = None,
     ) -> None:
         self._port_finder = port_finder or find_quneo_midi_port
         self._spawn = spawn or _default_spawn
@@ -166,6 +168,12 @@ class MidiWatcher:
         self._stop = threading.Event()
         self._lock = threading.Lock()
         self._thread: threading.Thread | None = None
+        # Optional on-disk persistence of last-known CC/note values so a bridge
+        # restart does not blank the board back to its all-off state. None (the
+        # test and library default) keeps everything in memory only.
+        self._state_file = Path(state_file) if state_file else None
+        if self._state_file is not None:
+            self._load()
 
     # --- public --------------------------------------------------------
     def start(self, poll_seconds: float = 0.5) -> None:
@@ -250,6 +258,40 @@ class MidiWatcher:
                     pass
             self._proc = None
 
+    def _load(self) -> None:
+        """Populate CC/note state from the state file, tolerating any absence
+        or corruption (a missing file is the normal first-run case)."""
+        if self._state_file is None:
+            return
+        try:
+            data = json.loads(self._state_file.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return
+        cc = data.get("cc", {}) if isinstance(data, dict) else {}
+        note = data.get("note", {}) if isinstance(data, dict) else {}
+        if isinstance(cc, dict):
+            for ch, vals in cc.items():
+                if isinstance(vals, dict):
+                    self._cc[int(ch)] = {int(k): int(v) for k, v in vals.items()}
+        if isinstance(note, dict):
+            for ch, vals in note.items():
+                if isinstance(vals, dict):
+                    self._note[int(ch)] = {int(k): bool(v) for k, v in vals.items()}
+
+    def _save(self) -> None:
+        """Atomically write current CC/note state; called under the lock, so a
+        torn write mid-drag cannot leave a half-updated file behind."""
+        if self._state_file is None:
+            return
+        payload = {"cc": self._cc, "note": self._note}
+        tmp = self._state_file.with_suffix(self._state_file.suffix + ".tmp")
+        try:
+            self._state_file.parent.mkdir(parents=True, exist_ok=True)
+            tmp.write_text(json.dumps(payload), encoding="utf-8")
+            os.replace(tmp, self._state_file)
+        except OSError:
+            pass
+
     def _pump(self, proc) -> None:
         try:
             for line in proc.stdout:
@@ -263,10 +305,12 @@ class MidiWatcher:
                         continue
                     if "note" in ev:
                         self._note.setdefault(ev["channel"], {})[ev["note"]] = ev["on"]
+                        self._save()
                     else:
                         self._cc.setdefault(ev["channel"], {})[ev["cc"]] = ev["value"]
                         if self._on_event is not None:
                             self._on_event(ev["cc"], ev["value"])
+                        self._save()
         except (OSError, ValueError):
             pass  # stdout closed by teardown or the child died
         finally:
