@@ -9,7 +9,8 @@
 //
 // Lighting is derived from raw hardware state, not synth params:
 //   - a slider or rotary lights from its channel's locCC value / 127
-//   - a pad lights one of four corner quadrants from its xCC/yCC location
+//   - a pad lights all four corners, weighted by its pressure (pressCC) and
+//     the live finger position (xCC/yCC), while its note is on
 //   - a button lights while its channel's note is on
 // Channel is per-control so a ch15 pad xCC/yCC never collides with a ch14
 // rotary locCC that happens to share the same number.
@@ -79,7 +80,7 @@ export function ccFraction(value) {
  *
  * Continuous controls (sliders/rotaries) read their locCC; binary controls
  * (buttons) light while their note is on. Pads are handled separately by
- * padQuadrant(). Anything without a binding (e.g. an unmapped button)
+ * padCorners(). Anything without a binding (e.g. an unmapped button)
  * returns 0 and stays dark.
  */
 export function controlFraction(control, cc, note) {
@@ -96,24 +97,44 @@ export function controlFraction(control, cc, note) {
 }
 
 /**
- * The quadrant of a pad a press lights, from channel-keyed CC state.
+ * Per-corner lit values for a pad while it is pressed, or null when dark.
  *
- * A pad exposes four touch corners resolved from its x/y location CCs (QuNeo
- * manual: X-Axis low→high is left→right, Y-Axis low→high is bottom→top).
- * Quadrant index: 0 = bottom-left, 1 = bottom-right, 2 = top-left,
- * 3 = top-right. The QuNeo latches x/y (outDmX/YReturn = -1 in the preset),
- * so the corner persists after the finger lifts: the pad stays lit at its
- * last location independent of note on/off. It is dark (null) only before
- * both xCC and yCC have been reported for that pad.
+ * The QuNeo reports a pad as three MIDI messages: a momentary note (on while
+ * the finger is down), a pressure CC (pressCC, live 0..127), and two position
+ * CCs (xCC/yCC, low→high left→right / bottom→top) that the preset latches.
+ * Faithful lighting is pressure-driven: the pad lights while its note is on
+ * and goes dark on note-off, so the latched x/y never keeps a released pad
+ * aglow. While pressed, the finger's pressure is shared out over the pad by
+ * its live position (bilinear interpolation), so the corner under the finger
+ * is brightest and the opposite corner dimmest — the physical "diff
+ * velocities depending on where the finger is" behaviour.
+ *
+ * Corner order matches the renderer's quad mesh order:
+ *   [bottom-left, bottom-right, top-left, top-right]
+ *
+ * Returns null when the pad should be dark (note off, or pressed but no live
+ * position yet), otherwise an array of four 0..1 corner values.
  */
-export function padQuadrant(control, cc) {
+export function padCorners(control, cc, note) {
   const ch = control.channel;
-  const chCC = (cc && cc[ch]) || {};
+  const chNote = (note && note[ch]) || {};
+  // A pad is lit only while its note is on (the momentary "pressed" state).
+  if (control.noteNum == null || chNote[control.noteNum] !== true) return null;
   if (control.xCC == null || control.yCC == null) return null;
+  const chCC = (cc && cc[ch]) || {};
   const x = chCC[control.xCC];
   const y = chCC[control.yCC];
-  if (x === undefined || y === undefined) return null; // no latched location yet
-  const col = x > 63 ? 1 : 0; // xCC high = right half
-  const row = y > 63 ? 1 : 0; // yCC high = top half
-  return row * 2 + col;
+  if (x === undefined || y === undefined) return null; // no live position yet
+  const fx = Math.min(1, Math.max(0, x / 127)); // 0 at left, 1 at right
+  const fy = Math.min(1, Math.max(0, y / 127)); // 0 at bottom, 1 at top
+  const pressure =
+    control.pressCC != null && chCC[control.pressCC] !== undefined
+      ? Math.min(1, Math.max(0, chCC[control.pressCC] / 127))
+      : 1; // before the first pressCC lands, a press lights at full pressure
+  return [
+    pressure * (1 - fx) * (1 - fy), // bottom-left
+    pressure * fx * (1 - fy),       // bottom-right
+    pressure * (1 - fx) * fy,       // top-left
+    pressure * fx * fy,             // top-right
+  ];
 }

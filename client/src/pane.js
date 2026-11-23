@@ -1,11 +1,12 @@
 // ColliderPane — SPEC §6 "collider pane". Maps the bridge's raw cc/note state
 // (/api/collider) onto every board control's lit value and emits it through
 // `onLit(control, value)`. value is 0..1 for sliders/rotaries (from locCC),
-// 0/1 for buttons (from note on/off), and a quadrant 0..3 or null for pads
-// (from xCC/yCC). The pane carries no three.js dependency; the renderer
-// subscribes via onLit.
+// 0/1 for buttons (from note on/off), and a four-corner array 0..1 each for
+// pads (pressure spread across xCC/yCC, LATCHED after release so the pad
+// stays aglow after touch; null only before its first press). The pane
+// carries no three.js dependency; the renderer subscribes via onLit.
 
-import { controlFraction, padQuadrant } from './board.js';
+import { controlFraction, padCorners } from './board.js';
 
 export class ColliderPane {
   /**
@@ -16,6 +17,7 @@ export class ColliderPane {
     this.controls = controls;
     this.segments = segments;
     this.onLit = null; // (control, value) => void
+    this._padLatch = new Map(); // control id -> last lit corners (pads latch)
   }
 
   /**
@@ -28,12 +30,27 @@ export class ColliderPane {
     let applied = 0;
     for (const control of this.controls) {
       const value = control.kind === 'pad'
-        ? padQuadrant(control, cc)
+        ? this._padValue(control, cc, note)
         : controlFraction(control, cc, note);
       if (this.onLit) this.onLit(control, value);
       applied++;
     }
     return applied;
+  }
+
+  /**
+   * A pad latches: it lights from the live x/y/pressure while pressed and
+   * keeps that lighting after the note lifts (the physical QuNeo leaves the
+   * pad's corners aglow after touch). Returns the four-corner array, or null
+   * before the pad has ever been touched.
+   */
+  _padValue(control, cc, note) {
+    const corners = padCorners(control, cc, note);
+    if (corners != null) {
+      this._padLatch.set(control.id, corners);
+      return corners;
+    }
+    return this._padLatch.get(control.id) ?? null;
   }
 
   /** Poll the endpoint once and apply the result. */

@@ -23,6 +23,7 @@ import json
 import mimetypes
 import os
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -44,6 +45,11 @@ from super_quneo_collider.midi import MidiWatcher
 from super_quneo_collider.sc import ScServer
 
 _DEFAULT_CLIENT_DIR = Path(__file__).resolve().parent.parent.parent / "client"
+
+# How often the bridge re-discovers the default sink.  The audio router is
+# idempotent (it only unlinks/links what changed), so a short period is cheap
+# and keeps scsynth following a sink that hot-swapped in after boot.
+_RE_ROUTE_SECONDS = 3.0
 
 
 class ColliderApp:
@@ -101,14 +107,27 @@ class ColliderApp:
     def start(self) -> None:
         """Boot scsynth, deliver the defs, route audio, watch MIDI.
 
-        Nothing is spawned here.  The board is silent until a control moves, so
-        the app never plays on its own at startup.
+        No voice is spawned here.  The board is silent until a control moves,
+        so the app never plays on its own at startup.
         """
         self.sc.boot()
         self.sc.load_defs()
         # link scsynth's audio into the default sink (best effort)
         self.router()
         self.midi.start()
+        # Keep following the default sink: a Bluetooth speaker that pairs after
+        # boot moves the default, so re-discover it on a short cadence instead
+        # of waiting for a restart.
+        self._route_thread = threading.Thread(
+            target=self._route_loop, name="audio-route", daemon=True
+        )
+        self._route_thread.start()
+
+    def _route_loop(self) -> None:
+        """Re-discover the default sink and re-link scsynth when it moves."""
+        while True:
+            time.sleep(_RE_ROUTE_SECONDS)
+            self.router()
 
     def on_cc(self, cc: int, raw: int, channel: int | None = None) -> None:
         channel = self.mapping.get("channel", 15) if channel is None else int(channel)

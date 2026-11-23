@@ -11,7 +11,7 @@ Last updated: 2026-11-23
   MIDI state from the bridge — not just the 3 synth-bound sliders. A pad pressed
   on the real board lights the same pad on the model, in the same orientation
   and brightness, and the state survives a bridge restart.
-- Backend: **138** pytest green. Frontend: **44** browser-harness tests green.
+- Backend: **140** pytest green. Frontend: **49** browser-harness tests green.
 
 ## Corner triggers + doc examples (§9.6/§9.7) — landed 2026-11-23
 
@@ -58,8 +58,17 @@ controls light too.
 - Frontend derives lit state from raw `cc`/`note`, not synth params:
   - vSlider fills toward the TOP (0 = dark, max = full).
   - hSlider / lSlider fills toward the RIGHT.
-  - pad lights its corner from latched x/y and stays lit after release, button latches.
-  - rotary renders a ring with a position indicator at the value's angle.
+  - pad lights a four-corner brightness field from live x/y and pressCC while its
+    note is down, and latches those corners after release (dark only before its
+    first press); button latches.
+  - rotary renders a ring with a single position indicator at the value's angle.
+- LED colour is **per-position, not a value ramp** (matching the hardware):
+  - hSlider / vSlider: a fixed 8-light 3-2-3 green/yellow/red ladder, filled
+    from the low end — the value chooses how many light, never the hue.
+  - lSlider (crossfader): 17 fixed-colour lights (3 red / 3 green / 2 yellow /
+    centre blue / 2 yellow / 3 green / 3 red) swept by a 3-light window.
+  - rotaries: red indicator only.
+  - pads: each corner keeps the green→yellow→red pressure ramp.
 - **Unmapped buttons (8 of 11).** `BasicSC_QuNeo` binds notes/CCs to only three
   physical buttons. The other eight render in the model but carry no
   `noteNum`/`pressCC`, so they stay dark until a note arrives on their channel:
@@ -74,20 +83,24 @@ controls light too.
 
 ## Pad quadrant lighting ("4×4×4" surface) — landed 2026-11-22
 
-Each physical pad now resolves its press into a corner, not a single binary
-face. `board.js` exposes `padQuadrant(control, cc)` which reads the pad's
-`xCC`/`yCC` (already tracked per-channel in `/api/collider`) and folds them into
-one of four quadrants — 16 pads × 4 = 64 touch points. `render.js` builds each
-pad as four quadrant meshes and `setLit` lights exactly one corner; `pane.js`
-routes pads through `padQuadrant`. Backend capture and mapping were already in
-place, so this was a frontend-only change.
+Each physical pad resolves its press into a four-corner brightness field, not a
+single binary face. `board.js` exposes `padCorners(control, cc, note)` which
+reads the pad's `pressCC` and `xCC`/`yCC` (already tracked per-channel in
+`/api/collider`) and returns `[bottom-left, bottom-right, top-left, top-right]`,
+each corner 0..1 — or `null` when the pad is dark. `render.js` builds each pad
+as four quadrant meshes driven directly by that array (16 pads × 4 = 64 touch
+points); `pane.js` routes pads through `padCorners`. Backend capture and mapping
+were already in place, so this was a frontend-only change.
 
 Convention (QuNeo manual): X-Axis low→high is left→right, Y-Axis low→high is
-bottom→top. Quadrant index: 0 = bottom-left, 1 = bottom-right, 2 = top-left,
-3 = top-right. The QuNeo latches x/y (`outDmXReturn`/`outDmYReturn` = -1 in the
-preset), so the lit corner persists after the finger lifts — the pad stays lit
-at its last location independent of note on/off; `null` (dark) only until x/y
-is first reported for that pad.
+bottom→top. The latched x/y position bilinearly spreads the press pressure
+across the four corners — a centred finger lights all four evenly, an
+off-centre finger favours the nearer corner. The pad is pressure-driven and
+note-gated at the *board* level (`padCorners` is null while the note is off),
+but the pane *latches* the last lit corners after release so the pad stays
+aglow until the next press, matching the hardware. Pressure comes from
+`pressCC` (falling back to full when that CC is unbound). Before the live x/y
+position is first reported for a pad it stays dark.
 
 No remaining work is outstanding from this milestone.
 

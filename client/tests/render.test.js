@@ -1,20 +1,30 @@
 // Renderer tests — run against real WebGL in the browser harness. buildBoard
-// builds a light for every control kind (vslider/hslider/lslider ladders,
-// rotary ring, pad four-quadrant faces, button single face). Each light
-// exposes setLit(value): sliders/rotaries take a 0..1 fraction, buttons take
-// 0/1, pads take a quadrant 0..3 (or null for dark). The test can pin lighting
-// direction without a running animate() loop. Direction contract: sliders fill
-// from their LOW end — vsliders bottom-up (toward the top of the board),
-// hsliders left-to-right (toward the right).
+// builds a light for every control kind (vslider/hslider ladders, lslider
+// crossfader window, rotary ring, pad four-quadrant faces, button single
+// face). Each light exposes setLit(value): sliders/rotaries take a 0..1
+// fraction, buttons take 0/1, pads take a four-corner array [bl,br,tl,tr]
+// (0..1 each, or null for dark). Direction contract: sliders fill from their
+// LOW end — vsliders bottom-up, hsliders left-to-right. Colour is per-position,
+// not a value ramp, matching the physical QuNeo: sliders are a fixed 8-light
+// 3-2-3 green/yellow/red ladder; the crossfader is 17 fixed-colour lights
+// swept by a 3-light window; rotaries light a single red indicator; pads keep
+// a green -> yellow -> red pressure ramp on each corner.
 
 import { test, assert, assertEqual } from './harness.js';
 import { loadLayout } from '../src/board.js';
-import { buildBoard, SEGMENTS, RING } from '../src/render.js';
+import { buildBoard, SEGMENTS, RING, CROSSFADER_SEGMENTS, rampColor } from '../src/render.js';
 
-const LIT = 0xff5522;
+const GREEN = 0x00ff00;
+const YELLOW = 0xffff00;
+const RED = 0xff0000;
+const BLUE = 0x0000ff;
 
 function lit(mesh) {
-  return mesh.material.emissive.getHex() === LIT;
+  return mesh.material.emissiveIntensity > 0;
+}
+
+function colorOf(mesh) {
+  return mesh.material.color.getHex();
 }
 
 function makeContainer() {
@@ -79,7 +89,33 @@ test('a hslider ladder fills left-to-right (toward the right)', async () => {
   }
 });
 
-test('a pad is four quadrant faces lit one at a time', async () => {
+test('sliders use a fixed 8-light 3-2-3 palette, filled by position', async () => {
+  const layout = await loadLayout('../LAYOUT.json');
+  const container = makeContainer();
+  const board = buildBoard(layout, container);
+  try {
+    const light = board.lights.get('hSliderButton0');
+    light.setLit(1); // full: all 8 light, each from its fixed colour
+    assertEqual(light.meshes.filter(lit).length, SEGMENTS, 'all SEGMENTS lit at 1');
+    const colors = light.meshes.map(colorOf);
+    assertEqual(colors[0], GREEN, 'position 1 (low) green');
+    assertEqual(colors[2], GREEN, 'position 3 green');
+    assertEqual(colors[3], YELLOW, 'position 4 yellow');
+    assertEqual(colors[4], YELLOW, 'position 5 yellow');
+    assertEqual(colors[5], RED, 'position 6 red');
+    assertEqual(colors[7], RED, 'position 8 (high) red');
+    // Partial fill lights only the low end, still with fixed colours.
+    light.setLit(0.25); // round(0.25 * 8) = 2 segments
+    assertEqual(light.meshes.filter(lit).length, 2, 'two segments lit at 0.25');
+    assertEqual(colorOf(light.meshes[0]), GREEN, 'lit low segment stays green');
+    assert(!lit(light.meshes[5]), 'red segment stays dark until the fill reaches it');
+  } finally {
+    board.dispose();
+    container.remove();
+  }
+});
+
+test('a pad is four quadrant faces lit from a four-corner value array', async () => {
   const layout = await loadLayout('../LAYOUT.json');
   const container = makeContainer();
   const board = buildBoard(layout, container);
@@ -90,14 +126,15 @@ test('a pad is four quadrant faces lit one at a time', async () => {
     // meshes[0] (bottom-left) sits low-right of meshes[3] (top-right).
     assert(light.meshes[0].position.z > light.meshes[2].position.z, 'bottom row is +z');
     assert(light.meshes[0].position.x < light.meshes[1].position.x, 'left column is -x');
-    light.setLit(null); // note off
+    light.setLit(null); // no position yet (renderer darkens on null directly)
     assertEqual(light.meshes.filter(lit).length, 0, 'all dark when null');
-    light.setLit(0); // bottom-left
+    light.setLit([1, 0, 0, 0]); // bottom-left only
     assertEqual(light.meshes.filter(lit).length, 1, 'one quadrant lit');
-    assert(lit(light.meshes[0]), 'quadrant 0 (bottom-left) lit');
+    assert(lit(light.meshes[0]), 'bottom-left lit');
     assert(!lit(light.meshes[3]), 'top-right stays dark');
-    light.setLit(3); // top-right
-    assert(lit(light.meshes[3]), 'quadrant 3 (top-right) lit');
+    assertEqual(colorOf(light.meshes[0]), RED, 'full pressure sits at the red end of the ramp');
+    light.setLit([0, 0, 0, 1]); // top-right only
+    assert(lit(light.meshes[3]), 'top-right lit');
     assert(!lit(light.meshes[0]), 'bottom-left now dark');
   } finally {
     board.dispose();
@@ -105,7 +142,48 @@ test('a pad is four quadrant faces lit one at a time', async () => {
   }
 });
 
-test('a rotary renders a RING of segments with one position indicator', async () => {
+test('the crossfader has 17 fixed-colour lights swept by a 3-light window', async () => {
+  const layout = await loadLayout('../LAYOUT.json');
+  const container = makeContainer();
+  const board = buildBoard(layout, container);
+  try {
+    const light = board.lights.get('lSliderButton0');
+    assertEqual(light.meshes.length, CROSSFADER_SEGMENTS, '17 lights');
+    assert(light.meshes[0].position.x < light.meshes[CROSSFADER_SEGMENTS - 1].position.x, 'index 0 is the left end');
+    light.setLit(0.5); // centre: window over indices 7, 8, 9
+    assertEqual(light.meshes.filter(lit).length, 3, 'three-light window at centre');
+    assertEqual(colorOf(light.meshes[7]), YELLOW, 'left of centre is yellow');
+    assertEqual(colorOf(light.meshes[8]), BLUE, 'centre light is blue');
+    assertEqual(colorOf(light.meshes[9]), YELLOW, 'right of centre is yellow');
+    light.setLit(0.25); // centre on index 4: window over the green band 3-5
+    const greenWin = light.meshes.filter(lit);
+    assertEqual(greenWin.length, 3, 'three-light window over the green band');
+    assert(greenWin.every((m) => colorOf(m) === GREEN), 'green band lights green');
+    light.setLit(1); // full right: window clamps to two red lights
+    const right = light.meshes.filter(lit);
+    assertEqual(right.length, 2, 'window clamps to two lights at the right end');
+    assert(right.every((m) => colorOf(m) === RED), 'right-end lights are red');
+    light.setLit(0); // full left
+    const left = light.meshes.filter(lit);
+    assertEqual(left.length, 2, 'window clamps to two lights at the left end');
+    assert(left.every((m) => colorOf(m) === RED), 'left-end lights are red');
+  } finally {
+    board.dispose();
+    container.remove();
+  }
+});
+
+test('the pad pressure ramp is green at low, yellow at mid, red at high', () => {
+  assertEqual(rampColor(0).getHex(), GREEN, '0 -> green');
+  assertEqual(rampColor(0.5).getHex(), YELLOW, '0.5 -> yellow');
+  assertEqual(rampColor(1).getHex(), RED, '1 -> red');
+  // Monotone through the ramp: green channel falls, red channel rises.
+  const low = rampColor(0.1), mid = rampColor(0.5), high = rampColor(0.9);
+  assert(low.g > low.r, 'low values are greener than red');
+  assert(high.r > high.g, 'high values are redder than green');
+});
+
+test('a rotary renders a RING of segments with one red position indicator', async () => {
   const layout = await loadLayout('../LAYOUT.json');
   const container = makeContainer();
   const board = buildBoard(layout, container);
@@ -119,8 +197,10 @@ test('a rotary renders a RING of segments with one position indicator', async ()
     light.setLit(0);
     assertEqual(light.meshes.filter(lit).length, 1, 'one segment lit at min');
     assert(lit(light.meshes[0]), 'min value sits on the first segment');
+    assertEqual(colorOf(light.meshes[0]), RED, 'the indicator is red, always');
     light.setLit(1);
     assert(lit(light.meshes[RING - 1]), 'max value sits on the last segment');
+    assertEqual(colorOf(light.meshes[RING - 1]), RED, 'indicator stays red at max');
     light.setLit(0.5);
     assertEqual(light.meshes.filter(lit).length, 1, 'exactly one lit at mid');
   } finally {

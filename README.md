@@ -47,9 +47,15 @@ Every SynthDef carries the same wrapper, so no example can run away:
 
 The three.js board reflects the real QuNeo, not just the three bound sliders:
 
-- vSliders fill toward the top, horizontal and long sliders toward the right,
-  pads light their pressed corner and stay lit after release (the QuNeo latches
-  x/y), buttons latch, and the two rotaries show a position indicator on a ring.
+- vSliders fill toward the top, and horizontal/long sliders toward the right,
+  pads light a four-corner brightness field from finger pressure and position
+  and latch their last-lit corners after release (dark only before the first
+  press), buttons latch, and the two rotaries show a single red position
+  indicator on a ring.
+- LED colour is per-position, not a value ramp: each slider is a fixed
+  green/yellow/red ladder the value fills (never recolours), the long slider is
+  a 17-light crossfader swept by a 3-light window with a blue centre, and the
+  rotaries are red only — matching the physical board.
 - Raw CC and note state is tracked per MIDI channel (channel 15 controls plus
   the two channel-14 rotaries), so every control lights in step with the board.
 - Last-known state persists to `$XDG_STATE_HOME/super-quneo-collider/state.json`
@@ -57,13 +63,10 @@ The three.js board reflects the real QuNeo, not just the three bound sliders:
 
 ## Audio
 
-On boot the bridge auto-routes scsynth into your default pipewire sink. If your
-sink changes (or you want a different output), reconnect manually:
-
-```bash
-pw-link SuperCollider:out_1 "$(pactl get-default-sink)":playback_FL
-pw-link SuperCollider:out_2 "$(pactl get-default-sink)":playback_FR
-```
+The bridge keeps scsynth's output wired to whichever pipewire sink is currently
+default, re-discovering it every few seconds. Spot a new output device and
+activate it (e.g. pair a Bluetooth speaker and set it as the default sink) and
+the audio follows without a restart. No manual `pw-link` is needed.
 
 Requires a pipewire/pulse system with `pw-link` and `pactl` on `PATH`.
 

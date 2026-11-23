@@ -11,7 +11,7 @@ import {
   indexById,
   ccFraction,
   controlFraction,
-  padQuadrant,
+  padCorners,
 } from '../src/board.js';
 
 const INLINE = {
@@ -72,45 +72,62 @@ test('controlFraction: rotary ch14 ignores the ch15 cc that shares its number', 
   assertEqual(controlFraction(rotary, cc, {}), 1, 'reads ch14 locCC 1, not ch15 cc 1');
 });
 
-test('padQuadrant: stays lit after the note goes off (x/y latches)', () => {
+test('padCorners: dark (null) while the note is off, even though x/y latch', () => {
   const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
-  // The QuNeo latches x/y (Return = -1), so the corner persists after release.
-  assertEqual(padQuadrant(pad, { 15: { 1: 127, 2: 127 } }), 3, 'x/y latched -> still top-right');
-  assertEqual(padQuadrant(pad, { 15: { 1: 0, 2: 0 } }), 0, 'x/y latched -> still bottom-left');
+  // The QuNeo latches x/y, but faithful lighting is pressure-driven: a pad
+  // goes dark on note-off and the latched position never keeps it aglow.
+  assertEqual(padCorners(pad, { 15: { 0: 127, 1: 127, 2: 127 } }, { 15: { 0: false } }), null, 'note off -> dark');
+  assertEqual(padCorners(pad, { 15: { 0: 127, 1: 127, 2: 127 } }, {}), null, 'no note -> dark');
 });
 
-test('padQuadrant: dark (null) only before x/y has been reported', () => {
+test('padCorners: dark when pressed but the live position has not arrived', () => {
   const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
-  assertEqual(padQuadrant(pad, {}), null, 'no cc -> dark');
-  assertEqual(padQuadrant(pad, { 15: {} }), null, 'no x/y on channel -> dark');
-  assertEqual(padQuadrant(pad, { 15: { 1: 127 } }), null, 'x only, no y -> dark');
-  assertEqual(padQuadrant(pad, { 15: { 2: 127 } }), null, 'y only, no x -> dark');
+  assertEqual(padCorners(pad, {}, { 15: { 0: true } }), null, 'no cc -> dark');
+  assertEqual(padCorners(pad, { 15: { 0: 127 } }, { 15: { 0: true } }), null, 'pressure but no x/y -> dark');
+  assertEqual(padCorners(pad, { 15: { 0: 127, 1: 127 } }, { 15: { 0: true } }), null, 'x only -> dark');
+  assertEqual(padCorners(pad, { 15: { 0: 127, 2: 127 } }, { 15: { 0: true } }), null, 'y only -> dark');
 });
 
-test('padQuadrant: xCC left + yCC bottom resolves to bottom-left (0)', () => {
+test('padCorners: full pressure bottom-left favours only that corner', () => {
   const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
-  assertEqual(padQuadrant(pad, { 15: { 1: 0, 2: 0 } }), 0, 'x low + y low -> 0');
+  const corners = padCorners(pad, { 15: { 0: 127, 1: 0, 2: 0 } }, { 15: { 0: true } });
+  assert(Array.isArray(corners), 'returns a corner array');
+  assert(Math.abs(corners[0] - 1) < 1e-9, 'bottom-left = 1');
+  assert(Math.abs(corners[1]) < 1e-9, 'bottom-right = 0');
+  assert(Math.abs(corners[2]) < 1e-9, 'top-left = 0');
+  assert(Math.abs(corners[3]) < 1e-9, 'top-right = 0');
 });
 
-test('padQuadrant: xCC right + yCC bottom resolves to bottom-right (1)', () => {
+test('padCorners: full pressure top-right favours only that corner', () => {
   const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
-  assertEqual(padQuadrant(pad, { 15: { 1: 127, 2: 0 } }), 1, 'x high + y low -> 1');
+  const corners = padCorners(pad, { 15: { 0: 127, 1: 127, 2: 127 } }, { 15: { 0: true } });
+  assert(Math.abs(corners[3] - 1) < 1e-9, 'top-right = 1');
+  assert(Math.abs(corners[0]) < 1e-9, 'bottom-left = 0');
 });
 
-test('padQuadrant: xCC left + yCC top resolves to top-left (2)', () => {
+test('padCorners: a centred finger splits pressure evenly over all four corners', () => {
   const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
-  assertEqual(padQuadrant(pad, { 15: { 1: 0, 2: 127 } }), 2, 'x low + y high -> 2');
+  const corners = padCorners(pad, { 15: { 0: 127, 1: 63, 2: 63 } }, { 15: { 0: true } });
+  for (const c of corners) assert(Math.abs(c - 0.25) < 0.02, `corner ~= 0.25, got ${c}`);
 });
 
-test('padQuadrant: xCC right + yCC top resolves to top-right (3)', () => {
+test('padCorners: pressure scales every corner proportionally', () => {
   const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
-  assertEqual(padQuadrant(pad, { 15: { 1: 127, 2: 127 } }), 3, 'x high + y high -> 3');
+  const corners = padCorners(pad, { 15: { 0: 64, 1: 0, 2: 0 } }, { 15: { 0: true } });
+  assert(Math.abs(corners[0] - 64 / 127) < 1e-9, 'bottom-left = pressCC/127 (64/127)');
 });
 
-test('padQuadrant reads its own channel (ch15 xCC/yCC, not ch14)', () => {
+test('padCorners falls back to full pressure when pressCC is unbound', () => {
+  const control = { channel: 15, noteNum: 0, pressCC: null, xCC: 1, yCC: 2 };
+  const corners = padCorners(control, { 15: { 1: 127, 2: 127 } }, { 15: { 0: true } });
+  assert(Math.abs(corners[3] - 1) < 1e-9, 'top-right = 1 despite missing pressCC');
+});
+
+test('padCorners reads its own channel (ch15 xCC/yCC, not ch14)', () => {
   const pad = indexById(normalizeLayout(INLINE).controls).get('padButton0');
   // ch14 rotary locCC 1 must not leak into the ch15 pad xCC
-  assertEqual(padQuadrant(pad, { 15: { 1: 127, 2: 127 }, 14: { 1: 0 } }), 3, 'ch15 top-right wins');
+  const corners = padCorners(pad, { 15: { 0: 127, 1: 127, 2: 127 }, 14: { 1: 0, 2: 0 } }, { 15: { 0: true } });
+  assert(Math.abs(corners[3] - 1) < 1e-9, 'ch15 top-right wins over ch14 zeros');
 });
 
 test('controlFraction: an unmapped button is always dark', () => {

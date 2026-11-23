@@ -438,20 +438,34 @@ Scenario Outline: a slider lights along its fill direction
     | 15      | 49 | 64    | ~0.5     | right     |
     | 14      | 1  | 32    | ~0.25    | ring      |
 
-Scenario Outline: a pad lights its corner and stays lit after release (x/y latches)
+Scenario: LED colour is fixed per position, not a value ramp
   Given the board model is rendered
-  When the pad's xCC reads <x> and its yCC reads <y>
-  Then the pad with noteNum <note> lights quadrant <quadrant>
-  When channel 15 note <note> turns off
-  Then the pad with noteNum <note> still lights quadrant <quadrant>
+  Then a slider lights a fixed 8-light ladder — 3 green, 2 yellow, 3 red — and the
+    value chooses how many light, never the hue
+  And the long slider (crossfader) lights a fixed 17-light run (3 red, 3 green,
+    2 yellow, centre blue, 2 yellow, 3 green, 3 red) swept by a 3-light window,
+    so only three are lit at a time
+  And a rotary shows a single red position indicator, never a colour ramp
+  And each pad corner keeps its green-yellow-red pressure ramp
+
+Scenario Outline: a pressed pad lights a four-corner field from pressure and position
+  Given channel 15 note <note> is on
+  And the pad's live xCC reads <x>, yCC reads <y> and pressCC reads <press>
+  Then the pad with noteNum <note> lights corners [<bl>, <br>, <tl>, <tr>]
 
   Examples:
-    | note | x   | y   | quadrant |
-    | 0    | 0   | 0   | 0        |
-    | 0    | 127 | 0   | 1        |
-    | 0    | 0   | 127 | 2        |
-    | 0    | 127 | 127 | 3        |
-    | 15   | 127 | 127 | 3        |
+    | note | x   | y   | press | bl  | br  | tl  | tr  |
+    | 0    | 0   | 0   | 127   | 1   | 0   | 0   | 0   |
+    | 0    | 127 | 0   | 127   | 0   | 1   | 0   | 0   |
+    | 0    | 0   | 127 | 127   | 0   | 0   | 1   | 0   |
+    | 0    | 127 | 127 | 127   | 0   | 0   | 0   | 1   |
+    | 0    | 64  | 64  | 127   | ~0.25 | ~0.25 | ~0.25 | ~0.25 |
+    | 15   | 127 | 127 | 127   | 0   | 0   | 0   | 1   |
+
+Scenario: a pad latches its lit corners after release
+  Given channel 15 pad note 0 was pressed and lit some corners
+  When channel 15 note 0 turns off
+  Then the pad with noteNum 0 keeps those corners lit
 
 Scenario: a pad stays dark until its x/y location is first reported
   Given the board model is rendered
@@ -662,7 +676,8 @@ Scenario: the bridge rejects a non-boolean ceiling
 - The board mirror is full-surface: the bridge tracks CC and note state per MIDI
   channel, `/api/collider` exposes `cc` and `note` alongside `sliders`, and the
   three.js model lights every control type (vSlider fills to the top, h/lSlider to the
-  right, pads only while pressed, buttons latched, rotaries on a ring).
+  right, pads latched after release — dark only before the first press — buttons
+  latched, rotaries on a ring).
 - Preset flashing is test-only: it is driven by `tests/helpers/quneo_flash.py`, which
   boots queneo-editor's editor server; the runtime bridge never imports, starts, or
   invokes it.
@@ -1047,15 +1062,21 @@ createDrumPad(00, 00, 00, 01, 02, 15)  ... createDrumPad(15, 15, 45, 46, 47, 15)
 (note = index, pressCC = index, xCC = index+1, yCC = index+2)
 
 Each pad reports a continuous `xCC`/`yCC` position in addition to note on/off, so a
-pad resolves its press into four corners (16 pads × 4 = 64 touch points). X-Axis runs
-low→high left→right and Y-Axis low→high bottom→top (QuNeo manual); `padQuadrant` in
-`board.js` folds the two axes into a corner index — 0 = bottom-left, 1 = bottom-right,
-2 = top-left, 3 = top-right — and `render.js` lights exactly that quadrant mesh from
-the latched x/y location. The QuNeo latches x/y (`outDmXReturn`/`outDmYReturn` = -1
-in the preset), so the corner persists after the finger lifts and the pad stays lit
-independent of note on/off; it is dark only before x/y is first reported. Backend
-`xCC`/`yCC` tracking and the per-pad `mapping.json` bindings were already in place, so
-this was a frontend-only change.
+pad resolves its press into a four-corner brightness field (16 pads × 4 = 64 touch
+points). X-Axis runs low→high left→right and Y-Axis low→high bottom→top (QuNeo
+manual); `padCorners` in `board.js` folds the two axes plus the press pressure into a
+four-corner array — `[bottom-left, bottom-right, top-left, top-right]`, each 0..1 —
+and `render.js` lights the four quadrant meshes from that array. The QuNeo latches
+x/y (`outDmXReturn`/`outDmYReturn` = -1 in the preset), so position is a continuous
+field rather than a discrete corner: a centred finger lights all four corners evenly,
+an off-centre finger favours the nearer corner. The pad is note-gated and
+pressure-driven — it lights while its note is on (brightness from `pressCC`, falling
+back to full when that CC is unbound). The board-level `padCorners` is null while the
+note is off, but the pane latches the last-lit corners after release so the pad stays
+aglow until its next press; it is dark only before its first press, until the live x/y
+position is first reported. Backend `xCC`/`yCC` tracking and the
+per-pad `mapping.json` bindings were already in place, so this was a frontend-only
+change.
 
 Horizontal sliders (noteNum, pressCC, locCC, channel 15):
 

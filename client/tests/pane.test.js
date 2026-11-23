@@ -1,8 +1,10 @@
 // ColliderPane tests — SPEC §6 "The three.js board mirrors the live QuNeo LED
 // state". Lighting now derives from the raw cc/note state (not synth params):
-// sliders/rotaries light from their channel's locCC, pads/buttons light from
-// their channel's note on/off. The pane emits onLit(control, fraction) so it
-// stays renderer-free.
+// sliders/rotaries light from their channel's locCC, buttons from their
+// channel's note on/off, and pads from a LATCHED pressure spread across
+// xCC/yCC: the pad lights its corners from live x/y while pressed and keeps
+// them lit after release (null only before its first press). The pane emits
+// onLit(control, value) so it stays renderer-free.
 
 import { test, assert, assertEqual } from './harness.js';
 import { normalizeLayout, indexById } from '../src/board.js';
@@ -45,17 +47,35 @@ test('applyState maps a slider value to a locCC fraction', () => {
   assertEqual(Math.abs(v0.fraction - 95 / 127) < 1e-9, true, 'fraction = 95/127');
 });
 
-test('applyState lights a pad quadrant from latched x/y (stays lit on release)', () => {
+test('applyState lights a pad as four corners and latches them after release', () => {
   const { pane, calls } = makePane();
+  // Full-pressure press in the top-right: only that corner is lit.
   pane.applyState({ present: true, cc: { 15: { 1: 127, 2: 127 } }, note: { 15: { 0: true } } });
-  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, 3, 'pad lights top-right (quadrant 3)');
+  const pad = calls.find((c) => c.id === 'padButton0');
+  assert(Array.isArray(pad.fraction), 'pad emits a four-corner array');
+  assertEqual(pad.fraction.length, 4, 'four corners');
+  assert(Math.abs(pad.fraction[3] - 1) < 1e-9, 'top-right corner = 1');
+  assert(Math.abs(pad.fraction[0]) < 1e-9, 'bottom-left corner = 0');
   calls.length = 0;
-  // note-off: x/y latches on the real board, so the pad stays lit
+  // note-off (finger lifted): the pad KEEPS its last corner lighting, matching
+  // the hardware latching the pad's corners aglow after touch.
   pane.applyState({ present: true, cc: { 15: { 1: 127, 2: 127 } }, note: { 15: { 0: false } } });
-  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, 3, 'pad stays lit top-right on note-off');
+  const latched = calls.find((c) => c.id === 'padButton0').fraction;
+  assert(Array.isArray(latched), 'pad still emits corners after release');
+  assert(Math.abs(latched[3] - 1) < 1e-9, 'top-right stays lit after release');
+  assert(Math.abs(latched[0]) < 1e-9, 'bottom-left stays dark after release');
   calls.length = 0;
+  // a fresh press in the bottom-left updates the latch
+  pane.applyState({ present: true, cc: { 15: { 1: 0, 2: 0 } }, note: { 15: { 0: true } } });
+  const updated = calls.find((c) => c.id === 'padButton0').fraction;
+  assert(Math.abs(updated[0] - 1) < 1e-9, 'bottom-left lit on a fresh bottom-left press');
+  assert(Math.abs(updated[3]) < 1e-9, 'top-right now dark');
+});
+
+test('applyState leaves a never-pressed pad dark', () => {
+  const { pane, calls } = makePane();
   pane.applyState({ present: true, cc: {}, note: {} });
-  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, null, 'pad dark only before any x/y hit');
+  assertEqual(calls.find((c) => c.id === 'padButton0').fraction, null, 'untouched pad emits null (dark)');
 });
 
 test('applyState lights a rotary from its ch14 locCC, not ch15', () => {
@@ -79,7 +99,7 @@ test('applyState handles an absent board (present false)', () => {
   const v0 = calls.find((c) => c.id === 'vSliderButton0');
   const pad = calls.find((c) => c.id === 'padButton0');
   assertEqual(v0.fraction, 0, 'slider dark');
-  assertEqual(pad.fraction, null, 'pad dark');
+  assertEqual(pad.fraction, null, 'pad dark (never pressed)');
 });
 
 test('getState parses the /api/collider payload including cc and note', async () => {
