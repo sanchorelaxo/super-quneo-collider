@@ -132,12 +132,12 @@ D8. **Exactly one example is active at a time; selection is a low-frequency writ
     derived from the catalog (never hand-written), renders next to the select so the user
     sees which control drives which parameter for the current example.
 
-D9. **The catalog spans three sources, and every example declares a gesture type.**
-    On top of the four supercolliderjs entries (D7), the catalog adds the four SuperCollider
-    documentation examples (`supercollider.github.io/examples.html`) and all 109
-    SCLOrkSynths SynthDefs (SCLOrkHub, 11 banks: bass, bells, drums, guitar, keyboards,
-    misc, organ, pads, percussion, strings, winds). Every entry carries a `gesture`, either
-    `continuous` or `oneshot`:
+D9. **The catalog spans every sourced SynthDef collection, and every example declares a
+    gesture type.** On top of the four supercolliderjs entries (D7), the catalog adds the
+    four SuperCollider documentation examples (`supercollider.github.io/examples.html`), all
+    109 SCLOrkSynths SynthDefs (SCLOrkHub, 11 banks: bass, bells, drums, guitar, keyboards,
+    misc, organ, pads, percussion, strings, winds), and the community collections catalogued
+    in section 9.9. Every entry carries a `gesture`, either `continuous` or `oneshot`:
 
     - `continuous` — a synth with a `gate` argument (a sustained ADSR held while a pad is
       down) or a self-running drone. Its parameters bind to the slider/rotary ladder of
@@ -529,11 +529,16 @@ Scenario: selecting an example never writes to the board
   When the client selects "sine"
   Then no preset is flashed and no MIDI is sent to the QuNeo
 
-Scenario: the catalog covers all three sources
+Scenario: the catalog covers every sourced collection
   Given the bridge is running
   When the client GETs /api/collider
-  Then the response lists 117 examples
+  Then the response lists at least 117 examples
   And the list includes "kick808", "superSaw", "kalimba" and "Simple FM"
+  And the list includes "bass8", "brute" and "sStream_Saw" from the section 9.9 sources
+
+Scenario: the catalog lists each def name only once
+  Given the catalog of examples
+  Then no two examples share a normalised def name
 
 Scenario: every example declares a gesture
   Given the catalog of examples
@@ -732,9 +737,12 @@ produce sound but exist to demonstrate API mechanics rather than sound manipulat
 `synthdef-and-synth.js` (a SynthDef-loading walkthrough) and
 `dryads-synth-event-list.js` (a drum-scheduler demo whose frequencies are random).
 
-Two more sources extend the catalog: the four SuperCollider documentation examples
-(section 9.7) and all 109 SCLOrkSynths SynthDefs (section 9.8). The full catalog is 117
-entries: 4 supercolliderjs + 4 documentation + 109 SCLOrkSynths.
+Further sources extend the catalog: the four SuperCollider documentation examples
+(section 9.7), all 109 SCLOrkSynths SynthDefs (section 9.8), and the community collections
+found in the GitHub survey of section 9.9. The first three sources give 117 entries
+(4 supercolliderjs + 4 documentation + 109 SCLOrkSynths); section 9.9 adds roughly 190
+deduplicated instrument SynthDefs on top, growing the select to about 300 entries. The
+exact per-entry list is fixed at authoring time by the dedupe key of 9.9.1.
 
 ### 9.2 Example parameters and their QuNeo bindings
 
@@ -921,6 +929,111 @@ is the implementation step. The spec fixes the convention and the gesture rule, 
 authoring is mechanical, not judgment.
 
 also see https://github.com/SCLOrkHub/SCLOrkSynths/tree/master/in-process/Completed (might be simpler to impl on 1st pass?)
+
+### 9.9 Further community SynthDef sources
+
+Sections 9.7 and 9.8 fixed the shape: any collection of sound-generating SynthDefs that can
+be delivered over `/d_recv` and driven by OSC is a candidate for the select. A GitHub survey
+of `.scd` SynthDef collections turned up eight more sources. Each is a pool of *named,
+self-contained SynthDefs*; the ones already folded into SCLOrkSynths are reference sources
+only and contribute no new entries.
+
+| source | stars | license | `.scd` | sound defs | notes |
+|--------|-------|---------|-------|-----------|-------|
+| `diegodorado/tidal-synths` | 45 | none stated | 28 | 28 (one per file) | SuperDirt-ready, so many route through `DirtPan`/`~dirt` (see 9.9.2); author credits the originals only loosely |
+| `loopier/synthdefs` | 31 | none stated | 48 | ~60 | 34 named instruments plus the 27-def `super*` bundle in its SuperDirt file; drop the effects, buffer and sequencer files |
+| `theseanco/awesome-synthdefs` | 75 | none stated | 4 bundles | 25, grows | an "awesome list" of packs; the `co34pt` bundle mixes buffer players with ~13 buffer-free synths |
+| `everythingwillbetakenaway/Synthdefs` | 86 | none stated | 83 | ~40 (~15 net-new) | the largest pool; mostly the SynthDefPool/synthDEFaults lineage, so most names are already in 9.8 |
+| `derekxkwan/dxkSynthDefs` | 26 | GPL-3.0 | 27 | ~40 | ships 248 defs, but most are stereo/mono effect, filter, delay and routing variants; the instruments live in `dxkDrums`/`dxkPitched`/`dxkModal`/`dxkSupSynths`/`dxkSimpleOsc` |
+| `redFrik/sInstruments` | 27 | GPL-3.0 | 21 | 13 | only `instruments/sStream.scd` holds standalone defs (the `sStream` family); `sCluster`/`sDrone`/`sGliss` are GUI instrument *programs*, not defs |
+| `supercollider-quarks/SynthDefPool` | 21 | (quark) | 16 | 11 (6 net-new) | the canonical upstream SCLOrkSynths borrowed from; nearly all names already duplicate 9.8 |
+| `thormagnusson/sctweets` | 9 | none stated | 25 | 1 | 140-char one-liners, almost all anonymous `.play` functions, so not catalog-shaped; deferred |
+
+Net-new against the current 117 is roughly 190 instrument SynthDefs, which would grow the
+select to about 300 entries.
+
+#### 9.9.1 The dedupe key
+
+An entry is keyed by its **normalised def name** (lowercased, non-alphanumerics stripped:
+`moogBass` == `moogbass`). Before authoring, every candidate is diffed against the names
+already in the catalog. A colliding name is dropped, never imported twice. This is why
+`SynthDefPool` and most of `everythingwillbetakenaway/Synthdefs` add few or no entries: their
+defs are already in 9.8. Same-name-different-graph is rare; when it happens the SCLOrkSynths
+version wins, because it is the one already standardised to the 9.8 argument convention.
+
+#### 9.9.2 Reshapes (same rules as 9.3)
+
+- **SuperDirt glue.** `tidal-synths` defs route through `DirtPan.ar(sig, ~dirt.numChannels,
+  ...)` and some read the `~dirt` global. That global does not exist under a bare scsynth, so
+  each def is rewritten to `Pan2.ar(sig, pan)` / `Out.ar(out, ...)` and stripped of `~dirt`
+  and `OffsetOut`. Routing only, no timbre change.
+- **Argument style.** `loopier` and `theseanco` write `\name.kr(default)` instead of `arg`,
+  which is already OSC-addressable, so no `arg` promotion is needed: the `control -> param`
+  binding reads the same name either way.
+- **Buffer players are excluded.** A def whose sound needs a sample (`buf` arg, `PlayBuf`,
+  `BufRd`, `Warp1`, `DiskIn`) cannot sound from the select alone. Those are dropped, or kept
+  only once the catalog carries a default sample per entry (a later increment).
+- **Programs, not defs.** `redFrik/sInstruments`'s `sCluster`/`sDrone`/`sGliss` are GUI
+  instrument *programs* (`In.ar(\bus)`, `Element`s, a `createDrone` closure). Lifting one def
+  out of each is a reshape, not a copy; they come last.
+- **One-line tweets.** `sctweets` are anonymous `{ ... }.play` functions, not named defs, so
+  each needs wrapping in `SynthDef(\name, { ... })` plus a name. Low priority.
+
+#### 9.9.3 Gesture (the D9 read rule, unchanged)
+
+Every imported def is classified by the same rule as 9.8: a `gate` argument implies
+`continuous`; a self-freeing envelope (`Env.perc`/`Env.sine` with `doneAction: 2`) and no
+`gate` implies `oneshot`. Worked examples, read from their sources:
+
+- `bass8` (`tidal-synths`) - `continuous`. `arg out=0, amp=0.1, gate=1, pan=0, freq=200`; a
+  six-oscillator sub-heavy bass with two `releaseNode:` envelopes driven by `gate`. `freq`
+  and `amp` -> slider ladder; `gate` -> pad press.
+- `rhodes` (`tidal-synths`) - `oneshot`. `|out, sustain=1, pan, accelerate, freq|` with
+  `Env.perc(0.0001, sustain, ..., -1), doneAction:2`. `sustain` (0-8 s) -> a reserved slider;
+  pitch from the corner.
+- `brute` (`loopier/synthdefs`) - `continuous`. `\gate.kr(1)` plus `Env.adsr(...).kr(2,
+  gate)`; args `freq, wave (0-2), pw, sub, fifth, overtone, attackTime, decayTime,
+  sustainLevel, releaseTime, amp, pan`. `wave`/`pw` and the four ADSR times are five
+  bindable params.
+- `tb303` (`loopier/synthdefs`) - `continuous`. `\gate.kr(1)` with `Env.adsr(gate,
+  doneAction:2)`; args `freq, cutoff, res, env, wave, attackTime/decayTime/sustainLevel/
+  releaseTime, amp, pan`. `cutoff` and `res` are the classic two.
+- `sStream_Saw` (`redFrik/sInstruments`) - `continuous` drone. The `sStream` family
+  (`sStream_Sine`, `_Saw`, `_Pulse`, `_Formant`, `_Karplus`, `_Noise`, `_Pink`, `_VOsc`,
+  `_SineFB`) share one argument shape; one slider picks the waveform, another the rate.
+- `sinfb` (`theseanco/awesome-synthdefs`) - `continuous`. `arg freq=440, atk=0.01, sus=0,
+  rel=1, fb=0, amp=0.3, out=0, pan=0`; the feedback index `fb` is the signature param.
+  `bpfsaw` and the `pulse3`/`sinfb3`/`saw3`/`tri3` group follow the same shape.
+- `dxkBd1` (`derekxkwan/dxkSynthDefs`, drums) - `oneshot`. The `dxkDrums` bank (`dxkBd1-3`,
+  `dxkHh1-3`, `dxkSd1-4`, `dxkCymb808`, `dxkGong1`, `dxkClap1`, `dxkCowbell1`) maps to pad
+  corners exactly like the 9.8 drum banks.
+
+#### 9.9.4 Licensing and attribution
+
+The bridge checks each def's `.scd` into `src/super_quneo_collider/`, so importing a def
+redistributes it, it does not merely reference it. That makes each source's license
+load-bearing:
+
+- **GPL-3.0** (`derekxkwan/dxkSynthDefs`, `redFrik/sInstruments`) - copyable, but the
+  copyleft travels with the file: keep the upstream `LICENSE` beside any imported def, and
+  treat the catalog as GPL-compatible if it is ever published.
+- **No license file** (`tidal-synths`, `loopier/synthdefs`, `theseanco/awesome-synthdefs`,
+  `everythingwillbetakenaway/Synthdefs`) - "public on GitHub" is not a license. Keep the
+  upstream URL and author in every imported def's header comment, use them locally, and
+  replace or clear them before any public release.
+- **`tidal-synths`** states outright that the originals "are surely not mine", so its
+  provenance is the weakest; treat it as study-and-adapt.
+
+A def is imported only once its header names the source repo, the upstream file and the
+author, following the per-file SCLOrkSynths convention of 9.8.
+
+#### 9.9.5 Authoring stays mechanical
+
+As in 9.8, full per-def `catalog.json` authoring for the roughly 190 imported defs is the
+implementation step. This section fixes the dedupe key (9.9.1), the reshape rules (9.9.2)
+and the gesture read rule (9.9.3), so authoring is mechanical: for each net-new def, diff
+the name, apply any reshape, read `gate` for the gesture, and bind the first two or three
+non-`out`/`pan` arguments to the slider ladder in declaration order.
 
 ---
 
