@@ -24,6 +24,11 @@ const STATE = {
     { id: 'formant', def: 'formant', source: 'formant.scd', gesture: 'continuous' },
     { id: 'sine', def: 'sine', source: 'sine-wave.js', gesture: 'continuous' },
     { id: 'klang', def: 'klang', source: 'klang.scd', gesture: 'continuous' },
+    { id: 'simpleFM', def: 'simpleFM', source: 'examples.html', gesture: 'continuous' },
+    { id: 'chainsaw', def: 'chainsaw', source: 'examples.html', gesture: 'continuous' },
+    { id: 'drummer', def: 'drummer', source: 'examples.html', gesture: 'continuous' },
+    { id: 'gabberkick', def: 'gabberkick', source: 'examples.html', gesture: 'oneshot' },
+    { id: 'hoover', def: 'hoover', source: 'examples.html', gesture: 'continuous' },
   ],
   helper: ['vSlider0 -> wobble      0-10',
            'vSlider1 -> innerWobble 0-16',
@@ -45,8 +50,8 @@ test('applyPicker fills the select from the catalog, in the bridge order', () =>
   const { select, helper, cleanup } = makePicker();
   try {
     applyPicker(select, helper, STATE);
-    assertEqual(exampleIds(STATE), ['bubbles', 'formant', 'sine', 'klang'], 'catalog ids');
-    assertEqual([...select.options].map((o) => o.value), ['bubbles', 'formant', 'sine', 'klang'], 'options');
+    assertEqual(exampleIds(STATE), ['bubbles', 'formant', 'sine', 'klang', 'simpleFM', 'chainsaw', 'drummer', 'gabberkick', 'hoover'], 'catalog ids');
+    assertEqual([...select.options].map((o) => o.value), ['bubbles', 'formant', 'sine', 'klang', 'simpleFM', 'chainsaw', 'drummer', 'gabberkick', 'hoover'], 'options');
     assertEqual(select.value, 'bubbles', 'default selection is the active example');
   } finally {
     cleanup();
@@ -72,7 +77,7 @@ test('applyPicker does not rebuild unchanged options (an open dropdown stays ope
     const first = select.options[0];
     applyPicker(select, helper, { ...STATE });
     assert(select.options[0] === first, 'same option element reused');
-    assertEqual(select.options.length, 4, 'still four options');
+    assertEqual(select.options.length, 9, 'still nine options');
   } finally {
     cleanup();
   }
