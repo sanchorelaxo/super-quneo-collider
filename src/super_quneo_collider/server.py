@@ -16,7 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from super_quneo_collider.audio import route_audio
-from super_quneo_collider.map import load_mapping, scale_cc
+from super_quneo_collider.map import channels, load_mapping, scale_cc
 from super_quneo_collider.midi import MidiWatcher
 from super_quneo_collider.sc import ScServer
 
@@ -57,9 +57,12 @@ class ColliderApp:
         self.sc.spawn_bubbles(-1, **self.sliders)
 
     def status(self) -> dict:
+        state = self.midi.state()
         return {
-            "present": self.midi.state()["present"],
+            "present": state["present"],
             "sliders": dict(self.sliders),
+            "cc": state["cc"],
+            "note": state["note"],
         }
 
 
@@ -72,14 +75,13 @@ def serve(config=None) -> None:
     mapping_path = config.get("mapping", str(_DEFAULT_MAPPING))
 
     mapping = load_mapping(mapping_path)
-    channel = mapping.get("channel", 15)
 
     app = None
 
     def _on_cc(cc: int, raw: int) -> None:
         app.on_cc(cc, raw)
 
-    midi = MidiWatcher(channel=channel, on_event=_on_cc)
+    midi = MidiWatcher(channels=channels(mapping), on_event=_on_cc)
     sc = ScServer(host=host, port=port)
     app = ColliderApp(mapping=mapping, midi=midi, sc=sc, node=node)
     app.start()

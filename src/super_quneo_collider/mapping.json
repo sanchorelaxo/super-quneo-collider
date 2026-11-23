@@ -1,9 +1,35 @@
 {
   "channel": 15,
   "controls": {
+    "padButton0":  {"noteNum": 0,  "pressCC": 0,  "xCC": 1,  "yCC": 2},
+    "padButton1":  {"noteNum": 1,  "pressCC": 3,  "xCC": 4,  "yCC": 5},
+    "padButton2":  {"noteNum": 2,  "pressCC": 6,  "xCC": 7,  "yCC": 8},
+    "padButton3":  {"noteNum": 3,  "pressCC": 9,  "xCC": 10, "yCC": 11},
+    "padButton4":  {"noteNum": 4,  "pressCC": 12, "xCC": 13, "yCC": 14},
+    "padButton5":  {"noteNum": 5,  "pressCC": 15, "xCC": 16, "yCC": 17},
+    "padButton6":  {"noteNum": 6,  "pressCC": 18, "xCC": 19, "yCC": 20},
+    "padButton7":  {"noteNum": 7,  "pressCC": 21, "xCC": 22, "yCC": 23},
+    "padButton8":  {"noteNum": 8,  "pressCC": 24, "xCC": 25, "yCC": 26},
+    "padButton9":  {"noteNum": 9,  "pressCC": 27, "xCC": 28, "yCC": 29},
+    "padButton10": {"noteNum": 10, "pressCC": 30, "xCC": 31, "yCC": 32},
+    "padButton11": {"noteNum": 11, "pressCC": 33, "xCC": 34, "yCC": 35},
+    "padButton12": {"noteNum": 12, "pressCC": 36, "xCC": 37, "yCC": 38},
+    "padButton13": {"noteNum": 13, "pressCC": 39, "xCC": 40, "yCC": 41},
+    "padButton14": {"noteNum": 14, "pressCC": 42, "xCC": 43, "yCC": 44},
+    "padButton15": {"noteNum": 15, "pressCC": 45, "xCC": 46, "yCC": 47},
+    "hSliderButton0": {"noteNum": 39, "pressCC": 92,  "locCC": 93},
+    "hSliderButton1": {"noteNum": 43, "pressCC": 100, "locCC": 101},
+    "hSliderButton2": {"noteNum": 47, "pressCC": 108, "locCC": 109},
+    "hSliderButton3": {"noteNum": 51, "pressCC": 116, "locCC": 117},
     "vSliderButton0": {"noteNum": 20, "pressCC": 60, "locCC": 61, "param": "wobble", "min": 0.0, "max": 10.0},
     "vSliderButton1": {"noteNum": 24, "pressCC": 68, "locCC": 69, "param": "innerWobble", "min": 0.0, "max": 16.0},
     "vSliderButton2": {"noteNum": 28, "pressCC": 76, "locCC": 77, "param": "releaseTime", "min": 2.0, "max": 6.0},
-    "vSliderButton3": {"noteNum": 32, "pressCC": 84, "locCC": 85}
+    "vSliderButton3": {"noteNum": 32, "pressCC": 84, "locCC": 85},
+    "lSliderButton0": {"noteNum": 16, "pressCC": 48, "locCC": 49, "widthCC": 50},
+    "buttonButton0":  {"noteNum": 36, "pressCC": 124},
+    "buttonButton1":  {"noteNum": 37, "pressCC": 125},
+    "buttonButton2":  {"noteNum": 38, "pressCC": 126},
+    "rotaryButton0":  {"noteNum": 0, "pressCC": 0, "locCC": 1, "channel": 14},
+    "rotaryButton1":  {"noteNum": 4, "pressCC": 8, "locCC": 9, "channel": 14}
   }
 }

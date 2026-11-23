@@ -74,8 +74,20 @@ class TestEventParsing:
         )
         assert ev == {"channel": 15, "cc": 61, "value": 64}
 
-    def test_ignores_note_events(self):
-        assert midi.parse_aseqdump_line(" 24:0   Note on                 0, note 7, velocity 127") is None
+    def test_parses_note_on(self):
+        assert midi.parse_aseqdump_line(
+            " 24:0   Note on                 0, note 7, velocity 127"
+        ) == {"channel": 0, "note": 7, "velocity": 127, "on": True}
+
+    def test_parses_note_off(self):
+        assert midi.parse_aseqdump_line(
+            " 24:0   Note off                0, note 7, velocity 0"
+        ) == {"channel": 0, "note": 7, "velocity": 0, "on": False}
+
+    def test_note_on_with_zero_velocity_is_off(self):
+        assert midi.parse_aseqdump_line(
+            " 24:0   Note on                 0, note 7, velocity 0"
+        ) == {"channel": 0, "note": 7, "velocity": 0, "on": False}
 
     def test_ignores_the_header(self):
         assert midi.parse_aseqdump_line("Source  Event                  Ch  Data") is None
@@ -123,7 +135,7 @@ class FakeProc:
         return -15 if self._dead else None
 
 
-def make_watcher(lines=(), clients=QUEO_CLIENTS, tmp_path=None, close_writer=False, on_event=None):
+def make_watcher(lines=(), clients=QUEO_CLIENTS, tmp_path=None, close_writer=False, on_event=None, channels=15):
     clients_path = write_clients(tmp_path, clients)
     spawned = []
 
@@ -136,6 +148,7 @@ def make_watcher(lines=(), clients=QUEO_CLIENTS, tmp_path=None, close_writer=Fal
         port_finder=lambda: midi.find_quneo_midi_port(path=clients_path),
         spawn=fake_spawn,
         on_event=on_event,
+        channels=channels,
     )
     return watcher, spawned
 
@@ -157,7 +170,7 @@ class TestWatcherState:
             tmp_path=tmp_path,
         )
         watcher.tick()
-        assert wait_for(lambda: watcher.state()["cc"].get(61) == 64)
+        assert wait_for(lambda: watcher.state()["cc"].get(15, {}).get(61) == 64)
         st = watcher.state()
         assert st["present"] is True and st["port"] == "24:0"
 
@@ -181,3 +194,64 @@ class TestWatcherState:
         watcher.tick()
         assert wait_for(lambda: len(seen) == 1)
         assert seen == [(61, 64)]
+
+    def test_records_note_state(self, tmp_path):
+        watcher, _ = make_watcher(
+            lines=[" 24:0   Note on                15, note 36, velocity 127"],
+            tmp_path=tmp_path,
+        )
+        watcher.tick()
+        assert wait_for(lambda: watcher.state()["note"].get(15, {}).get(36) is True)
+
+    def test_note_off_clears_note_state(self, tmp_path):
+        watcher, _ = make_watcher(
+            lines=[
+                " 24:0   Note on                15, note 36, velocity 127",
+                " 24:0   Note off               15, note 36, velocity 0",
+            ],
+            tmp_path=tmp_path,
+        )
+        watcher.tick()
+        assert wait_for(lambda: watcher.state()["note"].get(15, {}).get(36) is False)
+
+    def test_tracks_rotary_cc_on_channel_14(self, tmp_path):
+        watcher, _ = make_watcher(
+            lines=[" 24:0   Control change         14, controller 1, value 32"],
+            tmp_path=tmp_path,
+            channels={14, 15},
+        )
+        watcher.tick()
+        assert wait_for(lambda: watcher.state()["cc"].get(14, {}).get(1) == 32)
+
+    def test_pad_cc_and_rotary_cc_do_not_collide(self, tmp_path):
+        # pad xCC 1 (ch 15) and rotary locCC 1 (ch 14) share a controller
+        # number but live on different channels and must not overwrite.
+        watcher, _ = make_watcher(
+            lines=[
+                " 24:0   Control change         15, controller 1, value 9",
+                " 24:0   Control change         14, controller 1, value 32",
+            ],
+            tmp_path=tmp_path,
+            channels={14, 15},
+        )
+        watcher.tick()
+        assert wait_for(
+            lambda: watcher.state()["cc"].get(14, {}).get(1) == 32
+            and watcher.state()["cc"].get(15, {}).get(1) == 9
+        )
+
+    def test_pad_note_and_rotary_note_do_not_collide(self, tmp_path):
+        # pad note 0 (ch 15) and rotary note 0 (ch 14) share a note number.
+        watcher, _ = make_watcher(
+            lines=[
+                " 24:0   Note on                15, note 0, velocity 127",
+                " 24:0   Note on                14, note 0, velocity 100",
+            ],
+            tmp_path=tmp_path,
+            channels={14, 15},
+        )
+        watcher.tick()
+        assert wait_for(
+            lambda: watcher.state()["note"].get(14, {}).get(0) is True
+            and watcher.state()["note"].get(15, {}).get(0) is True
+        )

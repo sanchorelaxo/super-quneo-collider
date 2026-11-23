@@ -17,7 +17,7 @@ MAPPING = (
 
 class FakeMidi:
     def __init__(self):
-        self._state = {"present": True, "port": "24:0", "cc": {}}
+        self._state = {"present": True, "port": "24:0", "cc": {}, "note": {}}
         self.started = False
 
     def state(self):
@@ -66,6 +66,17 @@ def test_status_shape():
     st = make_app().status()
     assert isinstance(st["present"], bool)
     assert isinstance(st["sliders"], dict)
+    assert isinstance(st["cc"], dict)
+    assert isinstance(st["note"], dict)
+
+
+def test_status_exposes_midi_cc_and_note_state():
+    app = make_app()
+    app.midi._state["cc"] = {15: {61: 64}}
+    app.midi._state["note"] = {15: {36: True}}
+    st = app.status()
+    assert st["cc"] == {15: {61: 64}}
+    assert st["note"] == {15: {36: True}}
 
 
 def test_on_cc_triggers_bubble_with_value():

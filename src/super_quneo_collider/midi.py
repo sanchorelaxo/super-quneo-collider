@@ -33,6 +33,9 @@ _PORT_RE = re.compile(r'^\s+Port\s+(\d+)\s*:\s*"([^"]*)"')
 _CC_RE = re.compile(
     r"^\s*\d+:\d+\s+Control change\s+(\d+), controller (\d+), value (\d+)\s*$"
 )
+_NOTE_RE = re.compile(
+    r"^\s*\d+:\d+\s+Note (on|off)\s+(\d+), note (\d+), velocity (\d+)\s*$"
+)
 
 
 def find_quneo_midi_port(path: str | Path = SEQ_CLIENTS_PATH) -> str | None:
@@ -59,15 +62,30 @@ def find_quneo_midi_port(path: str | Path = SEQ_CLIENTS_PATH) -> str | None:
 
 
 def parse_aseqdump_line(line: str) -> dict | None:
-    """Structure aseqdump's control-change lines; ignore every other event."""
+    """Structure aseqdump's control-change and note lines.
+
+    Control change -> ``{"channel", "cc", "value"}``.
+    Note on/off     -> ``{"channel", "note", "velocity", "on"}`` where ``on``
+    is True only for a "Note on" whose velocity is non-zero (a note-on with
+    velocity 0 is a running-status release).  Every other event -> None.
+    """
     m = _CC_RE.match(line)
-    if not m:
-        return None
-    return {
-        "channel": int(m.group(1)),
-        "cc": int(m.group(2)),
-        "value": int(m.group(3)),
-    }
+    if m:
+        return {
+            "channel": int(m.group(1)),
+            "cc": int(m.group(2)),
+            "value": int(m.group(3)),
+        }
+    m = _NOTE_RE.match(line)
+    if m:
+        velocity = int(m.group(4))
+        return {
+            "channel": int(m.group(2)),
+            "note": int(m.group(3)),
+            "velocity": velocity,
+            "on": m.group(1) == "on" and velocity > 0,
+        }
+    return None
 
 
 def aseqdump_argv(port: str) -> list[str]:
@@ -128,18 +146,23 @@ class MidiWatcher:
         port_finder=None,
         spawn=None,
         clock=time.monotonic,
-        channel: int = 15,
+        channels: int | set[int] = 15,
         on_event=None,
     ) -> None:
         self._port_finder = port_finder or find_quneo_midi_port
         self._spawn = spawn or _default_spawn
         self._clock = clock
-        self._channel = channel
+        self._channels = {channels} if isinstance(channels, int) else set(channels)
         self._on_event = on_event
         self._present: bool | None = None
         self._port: str | None = None
         self._proc = None
-        self._cc: dict[int, int] = {}
+        # CC and note state are namespaced by MIDI channel: a pad xCC (ch 15)
+        # and a rotary locCC (ch 14) can share a controller number, and a pad
+        # note (ch 15) and a rotary note (ch 14) can share a note number, so a
+        # flat {number: value} map would merge distinct controls.
+        self._cc: dict[int, dict[int, int]] = {}
+        self._note: dict[int, dict[int, bool]] = {}
         self._stop = threading.Event()
         self._lock = threading.Lock()
         self._thread: threading.Thread | None = None
@@ -165,7 +188,8 @@ class MidiWatcher:
             return {
                 "present": self._present,
                 "port": self._port,
-                "cc": dict(self._cc),
+                "cc": {ch: dict(vals) for ch, vals in self._cc.items()},
+                "note": {ch: dict(vals) for ch, vals in self._note.items()},
             }
 
     def tick(self) -> None:
@@ -180,6 +204,7 @@ class MidiWatcher:
                 self._present = False
                 self._port = None
                 self._cc.clear()
+                self._note.clear()
                 return
             self._present = True
             self._port = port
@@ -234,11 +259,14 @@ class MidiWatcher:
                     ev = parse_aseqdump_line(line)
                     if ev is None:
                         continue
-                    if ev["channel"] != self._channel:
+                    if ev["channel"] not in self._channels:
                         continue
-                    self._cc[ev["cc"]] = ev["value"]
-                    if self._on_event is not None:
-                        self._on_event(ev["cc"], ev["value"])
+                    if "note" in ev:
+                        self._note.setdefault(ev["channel"], {})[ev["note"]] = ev["on"]
+                    else:
+                        self._cc.setdefault(ev["channel"], {})[ev["cc"]] = ev["value"]
+                        if self._on_event is not None:
+                            self._on_event(ev["cc"], ev["value"])
         except (OSError, ValueError):
             pass  # stdout closed by teardown or the child died
         finally:
