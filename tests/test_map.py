@@ -227,3 +227,10 @@ def test_helper_text_names_the_active_examples_variables(catalog):
         "vSlider1 -> nChans     1-8 (int)",
     ]
     assert helper_lines(catalog, "sine") == ["vSlider0 -> freq  40-2000 Hz (exp)"]
+
+
+def test_helper_lines_name_the_corner_for_a_oneshot(catalog):
+    assert helper_lines(catalog, "gabberkick") == [
+        "corner -> gabberkick",
+        "vSlider3 -> bend  0.4-1.0",
+    ]

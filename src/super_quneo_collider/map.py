@@ -128,11 +128,15 @@ def _range_text(param: dict, control_id: str) -> str:
 
 def helper_lines(catalog: dict, example_id: str) -> list:
     """One ``control -> param range`` line per binding, derived from the catalog."""
-    params = catalog["examples"][example_id]["params"]
+    entry = catalog["examples"][example_id]
+    params = entry["params"]
     labels = [_short_label(p["control"]) for p in params]
     label_width = max(len(label) for label in labels)
     name_width = max(len(p["name"]) for p in params)
-    return [
+    lines = [
         f"{label:<{label_width}} -> {p['name']:<{name_width}}  {_range_text(p, p['control'])}"
         for label, p in zip(labels, params)
     ]
+    if entry.get("gesture") == "oneshot":
+        lines.insert(0, f"corner -> {entry['def']}")
+    return lines
