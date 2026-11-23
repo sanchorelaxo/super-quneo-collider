@@ -103,9 +103,19 @@ def test_status_shape():
     assert isinstance(st["note"], dict)
 
 
-def test_status_lists_the_four_examples():
+def test_status_lists_all_nine_examples():
     st = make_app().status()
-    assert [e["id"] for e in st["examples"]] == ["bubbles", "formant", "sine", "klang"]
+    assert [e["id"] for e in st["examples"]] == [
+        "bubbles",
+        "formant",
+        "sine",
+        "klang",
+        "simpleFM",
+        "chainsaw",
+        "drummer",
+        "gabberkick",
+        "hoover",
+    ]
 
 
 def test_every_example_declares_a_def_source_and_gesture():
@@ -431,6 +441,11 @@ def test_api_collider_lists_the_examples():
             "formant",
             "sine",
             "klang",
+            "simpleFM",
+            "chainsaw",
+            "drummer",
+            "gabberkick",
+            "hoover",
         ]
         assert payload["activeExample"] == "bubbles"
 

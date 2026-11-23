@@ -39,6 +39,50 @@
         {"name": "nPartials", "control": "vSliderButton0", "cc": 61, "min": 1, "max": 32, "curve": "int", "default": 12},
         {"name": "nChans",    "control": "vSliderButton1", "cc": 69, "min": 1, "max": 8,  "curve": "int", "default": 5}
       ]
+    },
+    "simpleFM": {
+      "def": "simpleFM",
+      "source": "examples.html",
+      "gesture": "continuous",
+      "onset": "select",
+      "params": [
+        {"name": "modRate", "control": "vSliderButton0", "cc": 61, "min": 0.1, "max": 20, "curve": "exp", "default": 1}
+      ]
+    },
+    "chainsaw": {
+      "def": "chainsaw",
+      "source": "examples.html",
+      "gesture": "continuous",
+      "onset": "select",
+      "params": [
+        {"name": "amp", "control": "vSliderButton0", "cc": 61, "min": 0.0, "max": 1.0, "curve": "lin", "default": 0.3}
+      ]
+    },
+    "drummer": {
+      "def": "drummer",
+      "source": "examples.html",
+      "gesture": "continuous",
+      "onset": "select",
+      "params": [
+        {"name": "tempo", "control": "vSliderButton0", "cc": 61, "min": 0.5, "max": 16, "curve": "exp", "default": 4}
+      ]
+    },
+    "gabberkick": {
+      "def": "gabberkick",
+      "source": "examples.html",
+      "gesture": "oneshot",
+      "params": [
+        {"name": "bend", "control": "vSliderButton3", "cc": 85, "min": 0.4, "max": 1.0, "curve": "lin", "default": 1}
+      ]
+    },
+    "hoover": {
+      "def": "hoover",
+      "source": "examples.html",
+      "gesture": "continuous",
+      "onset": "note",
+      "params": [
+        {"name": "freq", "control": "vSliderButton0", "cc": 61, "min": 40, "max": 2000, "curve": "exp", "default": 440}
+      ]
     }
   }
 }

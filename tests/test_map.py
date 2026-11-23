@@ -96,8 +96,31 @@ def test_scale_value_int_rounds_to_whole_counts():
 
 # --- the catalog ---------------------------------------------------------
 
-def test_catalog_lists_the_four_stage_one_examples(catalog):
-    assert example_ids(catalog) == ["bubbles", "formant", "sine", "klang"]
+def test_catalog_lists_all_nine_examples(catalog):
+    assert example_ids(catalog) == [
+        "bubbles",
+        "formant",
+        "sine",
+        "klang",
+        "simpleFM",
+        "chainsaw",
+        "drummer",
+        "gabberkick",
+        "hoover",
+    ]
+
+
+def test_catalog_onset_and_gesture_distinguish_drones_from_one_shots(catalog):
+    examples = catalog["examples"]
+    # the three drones are re-tunable, so they bind on selection (onset select)...
+    for drone in ("simpleFM", "chainsaw", "drummer"):
+        assert examples[drone]["onset"] == "select"
+    # ...hoover re-triggers on note... and gabberkick is a one-shot...
+    assert examples["hoover"]["onset"] == "note"
+    assert examples["gabberkick"]["gesture"] == "oneshot"
+    # ...while the four stage-one examples declare no onset (default: cc).
+    for legacy in ("bubbles", "formant", "sine", "klang"):
+        assert "onset" not in examples[legacy]
 
 
 def test_bubbles_is_the_default(catalog):
