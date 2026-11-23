@@ -11,7 +11,7 @@ Last updated: 2026-11-23
   MIDI state from the bridge — not just the 3 synth-bound sliders. A pad pressed
   on the real board lights the same pad on the model, in the same orientation
   and brightness, and the state survives a bridge restart.
-- Backend: **136** pytest green. Frontend: **44** browser-harness tests green.
+- Backend: **138** pytest green. Frontend: **44** browser-harness tests green.
 
 ## Corner triggers + doc examples (§9.6/§9.7) — landed 2026-11-23
 
