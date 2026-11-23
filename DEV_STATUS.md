@@ -1,6 +1,6 @@
 # DEV_STATUS — super-quneo-collider
 
-Last updated: 2026-11-22
+Last updated: 2026-11-23
 
 ## Current state
 
@@ -11,7 +11,30 @@ Last updated: 2026-11-22
   MIDI state from the bridge — not just the 3 synth-bound sliders. A pad pressed
   on the real board lights the same pad on the model, in the same orientation
   and brightness, and the state survives a bridge restart.
-- Backend: **59** pytest green. Frontend: **21** browser-harness tests green.
+- Backend: **136** pytest green. Frontend: **44** browser-harness tests green.
+
+## Corner triggers + doc examples (§9.6/§9.7) — landed 2026-11-23
+
+The example catalog grew from 4 Stage-1 entries to 9, and the bridge now routes
+MIDI into every entry through three onset modes instead of CC-only bubbling.
+
+- Catalog: 9 entries — `bubbles`, `formant`, `sine`, `klang`, then `simpleFM`,
+  `chainsaw`, `drummer`, `gabberkick`, `hoover`. The five additions all import
+  from `examples.html`.
+- New `onset` sub-flavor per entry (`cc` default / `note` / `select`):
+  - `simpleFM` / `chainsaw` / `drummer` → `onset: select` (drone starts on
+    selection, fades on deselect).
+  - `hoover` → `onset: note` (gated — sounds only while a pad is held; vSlider0
+    sweeps pitch).
+  - `gabberkick` → `gesture: oneshot`, `onset: cc` (a fresh hit fires on every
+    pad corner press; vSlider3 shapes the pitch-drop).
+  - the four Stage-1 entries stay `cc` / continuous, untouched.
+- `on_note` dispatches by gesture first (oneshot → fresh `_trigger`), then by
+  onset (note → gate open/close); select- and cc-onset entries ignore notes.
+- `/api/collider` now reports `onset` per example, and `status()` reflects it.
+- DoD (§7): no preset is flashed and selection never writes to the board; all
+  nine defs are delivered at boot in the one-shot `sc.load_defs()` batch
+  (numDefs ≥ 9); selection remains control-plane only.
 
 ## Milestone detail (full-board lit-state mirror)
 
