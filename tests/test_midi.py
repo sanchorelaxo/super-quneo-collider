@@ -135,7 +135,7 @@ class FakeProc:
         return -15 if self._dead else None
 
 
-def make_watcher(lines=(), clients=QUEO_CLIENTS, tmp_path=None, close_writer=False, on_event=None, channels=15, state_file=None):
+def make_watcher(lines=(), clients=QUEO_CLIENTS, tmp_path=None, close_writer=False, on_event=None, on_note=None, channels=15, state_file=None):
     clients_path = write_clients(tmp_path, clients)
     spawned = []
 
@@ -148,6 +148,7 @@ def make_watcher(lines=(), clients=QUEO_CLIENTS, tmp_path=None, close_writer=Fal
         port_finder=lambda: midi.find_quneo_midi_port(path=clients_path),
         spawn=fake_spawn,
         on_event=on_event,
+        on_note=on_note,
         channels=channels,
         state_file=state_file,
     )
@@ -214,6 +215,21 @@ class TestWatcherState:
         )
         watcher.tick()
         assert wait_for(lambda: watcher.state()["note"].get(15, {}).get(36) is False)
+
+    def test_fires_on_note_for_channel_15(self, tmp_path):
+        seen = []
+        watcher, _ = make_watcher(
+            lines=[
+                " 24:0   Note on                15, note 36, velocity 127",
+                " 24:0   Note off               15, note 36, velocity 0",
+                " 24:0   Note on                15, note 36, velocity 0",
+            ],
+            tmp_path=tmp_path,
+            on_note=lambda note, on, channel: seen.append((note, on, channel)),
+        )
+        watcher.tick()
+        assert wait_for(lambda: len(seen) == 3)
+        assert seen == [(36, True, 15), (36, False, 15), (36, False, 15)]
 
     def test_tracks_rotary_cc_on_channel_14(self, tmp_path):
         watcher, _ = make_watcher(

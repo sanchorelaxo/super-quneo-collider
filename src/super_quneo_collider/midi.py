@@ -149,6 +149,7 @@ class MidiWatcher:
         clock=time.monotonic,
         channels: int | set[int] = 15,
         on_event=None,
+        on_note=None,
         state_file: str | Path | None = None,
     ) -> None:
         self._port_finder = port_finder or find_quneo_midi_port
@@ -156,6 +157,7 @@ class MidiWatcher:
         self._clock = clock
         self._channels = {channels} if isinstance(channels, int) else set(channels)
         self._on_event = on_event
+        self._on_note = on_note
         self._present: bool | None = None
         self._port: str | None = None
         self._proc = None
@@ -306,6 +308,8 @@ class MidiWatcher:
                     if "note" in ev:
                         self._note.setdefault(ev["channel"], {})[ev["note"]] = ev["on"]
                         self._save()
+                        if self._on_note is not None:
+                            self._on_note(ev["note"], ev["on"], ev["channel"])
                     else:
                         self._cc.setdefault(ev["channel"], {})[ev["cc"]] = ev["value"]
                         if self._on_event is not None:

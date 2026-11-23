@@ -229,9 +229,13 @@ def serve(config=None) -> None:
     def _on_cc(cc: int, raw: int, channel: int) -> None:
         app.on_cc(cc, raw, channel)
 
+    def _on_note(note, on, channel) -> None:
+        app.on_note(note, on, channel)
+
     midi = MidiWatcher(
         channels=channels(mapping),
         on_event=_on_cc,
+        on_note=_on_note,
         state_file=config.get("state_file") or _default_state_file(),
     )
     sc = ScServer(host=host, port=port)
