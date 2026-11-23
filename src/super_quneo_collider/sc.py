@@ -35,7 +35,17 @@ _SCLANG_BIN = "sclang"
 _DEF_DIR = Path(__file__).resolve().parent
 # Every example in catalog.json, in catalog order.  Each *.scd is a fragment
 # that evaluates to one SynthDef; load_defs() composes them into one batch.
-_DEF_SCRIPTS = ("bubbles.scd", "formant.scd", "sine.scd", "klang.scd")
+_DEF_SCRIPTS = (
+    "bubbles.scd",
+    "formant.scd",
+    "sine.scd",
+    "klang.scd",
+    "simpleFM.scd",
+    "chainsaw.scd",
+    "drummer.scd",
+    "gabberkick.scd",
+    "hoover.scd",
+)
 # The same defs by name, in the same order, for callers that talk about them.
 DEF_NAMES = tuple(Path(name).stem for name in _DEF_SCRIPTS)
 

@@ -1,5 +1,7 @@
+import json
 import os
 import threading
+from pathlib import Path
 
 import pytest
 
@@ -16,7 +18,23 @@ scsynth_ok = pytest.mark.skipif(
     resolve_scsynth() is None, reason="scsynth not installed"
 )
 
-# The catalog's four Stage-1 examples, in catalog order.
+# The catalog's examples, in catalog order.
+
+
+def test_def_scripts_cover_every_catalog_example():
+    # Every catalog entry maps to one shipped def fragment, in catalog order:
+    # sc.py's _DEF_SCRIPTS (and DEF_NAMES) must enumerate them 1:1 (D7).
+    catalog = json.loads(
+        (
+            Path(__file__).resolve().parent.parent
+            / "src"
+            / "super_quneo_collider"
+            / "catalog.json"
+        ).read_text()
+    )
+    defs = tuple(v["def"] for v in catalog["examples"].values())
+    assert DEF_NAMES == tuple(defs)
+    assert len(DEF_NAMES) == 9
 
 
 def test_resolve_scsynth_exists():
@@ -41,7 +59,7 @@ def test_boot_answers_status():
 
 
 @scsynth_ok
-def test_load_defs_delivers_all_four_examples():
+def test_load_defs_delivers_all_examples():
     # D7: every example arrives at boot through the same one-shot sclang path,
     # so switching examples later is a pure control-plane event.
     s = ScServer()
@@ -139,10 +157,10 @@ def test_batch_source_wraps_every_def_once():
 
 
 def test_load_defs_uses_one_sclang_run():
-    # Four examples, one sclang process: the defs travel as a composed batch,
+    # One sclang process for every example: the defs travel as a composed batch,
     # so adding catalog entries does not add startup processes.
     calls = []
-    s = ScServer(spawn=RecordingSpawn(calls), probe=lambda *a, **k: {"numDefs": 4})
+    s = ScServer(spawn=RecordingSpawn(calls), probe=lambda *a, **k: {"numDefs": len(DEF_NAMES)})
     assert s.load_defs() is True
     assert len(calls) == 1
     argv = calls[0]
@@ -163,7 +181,7 @@ def test_load_defs_confirms_defs_via_status():
 
         def __call__(self):
             self.n += 1
-            return {"numDefs": 4 if self.n > 2 else 0}
+            return {"numDefs": len(DEF_NAMES) if self.n > 2 else 0}
 
     s = ScServer(spawn=RecordingSpawn(calls), probe=SlowProbe())
     assert s.load_defs() is True
@@ -188,7 +206,7 @@ def test_load_defs_fails_when_sclang_exits_nonzero():
             calls.append(list(argv))
             return _FakeProc(1)
 
-    s = ScServer(spawn=BadSpawn(), probe=lambda *a, **k: {"numDefs": 9})
+    s = ScServer(spawn=BadSpawn(), probe=lambda *a, **k: {"numDefs": len(DEF_NAMES)})
     assert s.load_defs() is False
     assert len(calls) == 1
 
