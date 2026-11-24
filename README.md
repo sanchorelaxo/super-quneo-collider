@@ -5,7 +5,7 @@ over HTTP at `/api/collider`. A three.js model of the board mirrors the physical
 QuNeo's lit/unlit state across the full control surface, and a `<select>`
 switches which example SynthDef the sliders drive.
 
-![QuNeo controller on laptop running step sequencer](docs/quneo-setup.jpg)
+![QuNeo controller on laptop running step sequencer](docs/quneo-setup_new.jpg)
 
 ## Install
 
