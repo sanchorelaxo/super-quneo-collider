@@ -2,7 +2,10 @@
 // board slab plus one light handle per physical control, and lets the caller
 // drive each control's lit state via light.setLit(value), where value is a
 // 0..1 fraction for sliders/rotaries, a four-corner array [bl,br,tl,tr]
-// (0..1 each, or null for dark) for pads, and 0/1 for buttons. Lighting
+// (0..1 each, or null for dark) for pads, and 0/1 for buttons. null means the
+// board has reported nothing for that control and is drawn dark — on a rotary
+// ring and on the crossfader 0 is itself a lit position, so silence must not
+// read as 0. Lighting
 // direction:
 //   vsliders fill bottom-up (toward the top of the board),
 //   hsliders fill left-to-right (toward the right),
@@ -216,7 +219,9 @@ function buildLadder(control, orient) {
     kind: control.kind,
     meshes,
     setLit(fraction) {
-      const f = Math.min(1, Math.max(0, fraction));
+      // null = the board has reported nothing; a ladder is dark at 0 too, so
+      // silence and 0 collapse onto the same frame here.
+      const f = fraction == null ? 0 : Math.min(1, Math.max(0, fraction));
       const litCount = Math.round(f * SEGMENTS);
       meshes.forEach((m, i) => setMeshTint(m, SLIDER_COLORS[i], i < litCount));
     },
@@ -246,6 +251,13 @@ function buildRing(control) {
     kind: control.kind,
     meshes,
     setLit(fraction) {
+      // null = the board has reported nothing for this rotary: no position is
+      // known, so the whole ring is dark. It must not fall through to 0, which
+      // IS a position here (the indicator lights at north).
+      if (fraction == null) {
+        meshes.forEach((m) => setMeshTint(m, ROTARY_LIT, false));
+        return;
+      }
       const f = Math.min(1, Math.max(0, fraction));
       const idx = Math.min(RING - 1, Math.floor(f * RING));
       // The position indicator is always lit red; the other segments stay
@@ -314,6 +326,13 @@ function buildCrossfader(control) {
     kind: control.kind,
     meshes,
     setLit(fraction) {
+      // null = nothing reported: no window position is known, so the bar is
+      // dark. It must not fall through to 0, where the window is clamped to
+      // the two leftmost lights.
+      if (fraction == null) {
+        meshes.forEach((m, i) => setMeshTint(m, CROSSFADER_COLORS[i], false));
+        return;
+      }
       const f = Math.min(1, Math.max(0, fraction));
       const center = Math.round(f * (CROSSFADER_SEGMENTS - 1));
       meshes.forEach((m, i) => setMeshTint(m, CROSSFADER_COLORS[i], Math.abs(i - center) <= 1));
@@ -333,7 +352,7 @@ function buildBinary(control) {
     kind: control.kind,
     meshes: [mesh],
     setLit(fraction) {
-      setMeshLit(mesh, fraction > 0);
+      setMeshLit(mesh, fraction != null && fraction > 0);
     },
   };
 }

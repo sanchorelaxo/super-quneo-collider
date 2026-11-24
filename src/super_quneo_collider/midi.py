@@ -202,6 +202,18 @@ class MidiWatcher:
                 "note": {ch: dict(vals) for ch, vals in self._note.items()},
             }
 
+    def clear(self) -> None:
+        """Forget every mirrored CC/note value.
+
+        Called after the board has been reloaded: nothing the board reported
+        before the reset is true any more, and the persisted copy would light
+        the UI on the next bridge start from values the board no longer holds.
+        """
+        with self._lock:
+            self._cc.clear()
+            self._note.clear()
+            self._save()
+
     def tick(self) -> None:
         """One poll cycle: refresh presence, (re)spawn the reader if needed."""
         with self._lock:

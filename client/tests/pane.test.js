@@ -89,7 +89,26 @@ test('applyState leaves the unmapped button dark', () => {
   const { pane, calls } = makePane();
   pane.applyState({ present: true, cc: {}, note: { 15: { 100: true } } });
   const btn = calls.find((c) => c.id === 'buttonButton9');
-  assertEqual(btn.fraction, 0, 'unmapped button stays dark');
+  assertEqual(btn.fraction, null, 'unmapped button emits null (dark)');
+});
+
+test('clearLit darkens every control, whatever was lit before', () => {
+  const { pane, calls } = makePane();
+  // Light the whole surface first: slider, rotary at a position, pad pressed.
+  pane.applyState({
+    present: true,
+    cc: { 14: { 1: 127 }, 15: { 61: 95, 1: 127, 2: 127 } },
+    note: { 15: { 0: true } },
+  });
+  assert(calls.some((c) => c.fraction > 0 || Array.isArray(c.fraction)), 'something was lit first');
+  calls.length = 0;
+  pane.clearLit();
+  assertEqual(calls.length, 4, 'a dark frame for every control');
+  for (const c of calls) {
+    const dark = c.fraction == null
+      || (Array.isArray(c.fraction) ? c.fraction.every((v) => v === 0) : c.fraction === 0);
+    assert(dark, `${c.id} is dark after the reset`);
+  }
 });
 
 test('applyState handles an absent board (present false)', () => {
@@ -98,7 +117,7 @@ test('applyState handles an absent board (present false)', () => {
   assertEqual(applied, 4, 'still emits a dark frame for every control');
   const v0 = calls.find((c) => c.id === 'vSliderButton0');
   const pad = calls.find((c) => c.id === 'padButton0');
-  assertEqual(v0.fraction, 0, 'slider dark');
+  assertEqual(v0.fraction, null, 'slider dark (nothing reported)');
   assertEqual(pad.fraction, null, 'pad dark (never pressed)');
 });
 

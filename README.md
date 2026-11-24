@@ -60,6 +60,11 @@ The three.js board reflects the real QuNeo, not just the three bound sliders:
   the two channel-14 rotaries), so every control lights in step with the board.
 - Last-known state persists to `$XDG_STATE_HOME/super-quneo-collider/state.json`
   and reloads on boot, so a bridge restart does not blank the board.
+- Two buttons sit in the bottom-right corner of the page: "Restart Server"
+  replaces the bridge process and stays disabled until a freshly booted bridge
+  answers, and "Reset Board" blanks the board and the model together. Opening the
+  page resets the board, so a reload always starts dark instead of lit from the
+  state the bridge kept.
 
 ## Audio
 

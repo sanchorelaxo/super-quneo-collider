@@ -15,6 +15,11 @@ example, or toggling the ceiling, fades the live voice out (``gate 0`` -> the
 def's 3 s stop fade) and forgets it.  ``serve()`` is the process entry point: it
 boots the app, wires the watcher's ``on_event`` to ``on_cc``, and serves the
 JSON API plus the static client on ``127.0.0.1``.
+
+Two admin routes back the buttons in the client's bottom right corner: ``POST
+/api/collider/reset`` blanks the board (see :mod:`super_quneo_collider.board`)
+and forgets the state it had mirrored, and ``POST /api/collider/restart``
+answers the caller, then replaces this process with a fresh copy of the bridge.
 """
 
 from __future__ import annotations
@@ -22,12 +27,14 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
+import sys
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from super_quneo_collider import board
 from super_quneo_collider.audio import route_audio
 from super_quneo_collider.map import (
     DEFAULT_CATALOG,
@@ -51,6 +58,17 @@ _DEFAULT_CLIENT_DIR = Path(__file__).resolve().parent.parent.parent / "client"
 # and keeps scsynth following a sink that hot-swapped in after boot.
 _RE_ROUTE_SECONDS = 3.0
 
+# A restart answers first and hands the process over a beat later, so the client
+# sees a clean reply instead of a connection that died mid-request.
+_RESTART_DELAY = 0.4
+
+# When this process was imported (what ``uptime_s`` counts from), and which
+# process image this is.  A restart hands the image over with ``execve``, so the
+# pid survives it: the boot id is what changes, and the client waits for a
+# different one before it believes the new bridge is the one answering.
+_STARTED_AT = time.monotonic()
+_BOOT_ID = os.urandom(4).hex()
+
 
 class ColliderApp:
     def __init__(
@@ -63,6 +81,9 @@ class ColliderApp:
         router=route_audio,
         active=None,
         fade=True,
+        darken=None,
+        replace=None,
+        http_port=8686,
     ):
         self.mapping = mapping
         self.catalog = catalog
@@ -73,6 +94,12 @@ class ColliderApp:
         self.active = active or default_example_id(catalog)
         # The 12 s ceiling is on unless the fade checkbox turns it off.
         self.fade = bool(fade)
+        # Where a restarted bridge has to come back, so the page can find it.
+        self.http_port = int(http_port)
+        # The one write to the board, and the process hand-over.  Both are
+        # injected, so the tests never touch hardware or exec anything.
+        self._darken = darken or board.darken
+        self._replace = replace or _replace_process
         self.bindings: dict = {}
         self.sliders: dict[str, float] = {}
         self._bind()
@@ -275,9 +302,48 @@ class ColliderApp:
             "sliders": dict(self.sliders),
             "fadeEnabled": self.fade,
             "voices": sorted(self._voices),
+            # What the client watches while it waits for a restart to land.
+            "pid": os.getpid(),
+            "boot": _BOOT_ID,
+            "uptime_s": round(time.monotonic() - _STARTED_AT, 1),
             "cc": state["cc"],
             "note": state["note"],
         }
+
+    def reset_board(self) -> bool:
+        """Blank the board, and forget the state it reported before the reset.
+
+        Reloading the preset clears every LED, including the rotaries and the
+        cross fader that hold their own lighting and survive a sweep of remote
+        messages.  The mirrored values go with it: the board does not hold them
+        any more, so the UI and the state file must not light up from them.
+        """
+        darkened = bool(self._darken())
+        self.midi.clear()
+        return darkened
+
+    def restart(self, delay: float | None = None) -> str | None:
+        """Hand this process over to a fresh copy of the bridge.
+
+        Returns an error message if the hand-over would strand the page, else
+        None.  The reply has to leave before the process goes: the client gets a
+        normal answer, then polls until the new copy reports a fresh uptime.
+        """
+        if not self.http_port:
+            return "cannot restart a bridge that is on an ephemeral port"
+        seconds = _RESTART_DELAY if delay is None else delay
+        threading.Timer(seconds, self._hand_over).start()
+        return None
+
+    def _hand_over(self) -> None:
+        """Free scsynth's port, then become the new bridge.
+
+        The stop comes first, because the child holds the port the incoming
+        bridge boots its own server on; the exec comes last, because nothing
+        after it runs.
+        """
+        self.sc.stop()
+        self._replace()
 
 
 def serve(config=None) -> None:
@@ -314,6 +380,7 @@ def serve(config=None) -> None:
         sc=sc,
         node=node,
         fade=config.get("fade", True),
+        http_port=http_port,
     )
     app.start()
 
@@ -322,6 +389,20 @@ def serve(config=None) -> None:
     finally:
         app.sc.stop()
         app.midi.stop()
+
+
+def reexec_argv() -> list[str]:
+    """The command that starts this bridge again, from wherever it was started.
+
+    The module form, not a file path: a path depends on the working directory
+    the bridge happened to be started from.
+    """
+    return [sys.executable, "-m", "super_quneo_collider.server"]
+
+
+def _replace_process() -> None:
+    """Exec a fresh bridge over this process.  Does not return."""
+    os.execve(sys.executable, reexec_argv(), dict(os.environ))
 
 
 def _default_state_file() -> Path:
@@ -334,7 +415,12 @@ def _guess_type(path: str) -> str:
     return ctype or "application/octet-stream"
 
 
-_POST_ROUTES = ("/api/collider/example", "/api/collider/fade")
+_POST_ROUTES = (
+    "/api/collider/example",
+    "/api/collider/fade",
+    "/api/collider/reset",
+    "/api/collider/restart",
+)
 
 
 def _apply_post(app: ColliderApp, path: str, payload: dict) -> str | None:
@@ -342,6 +428,10 @@ def _apply_post(app: ColliderApp, path: str, payload: dict) -> str | None:
     if path == "/api/collider/example":
         wanted = payload.get("id")
         return None if app.select_example(wanted) else f"unknown example: {wanted}"
+    if path == "/api/collider/reset":
+        return None if app.reset_board() else "the board did not accept the reset"
+    if path == "/api/collider/restart":
+        return app.restart()
     enabled = payload.get("enabled")
     if not isinstance(enabled, bool):
         return "enabled must be true or false"
@@ -401,6 +491,9 @@ def _make_handler(app: ColliderApp, client_dir: Path):
             data = target.read_bytes()
             self.send_response(200)
             self.send_header("Content-Type", _guess_type(rel))
+            # Read from disk on every request: the client is plain modules with
+            # no build step, so a reload has to get the file the edit just wrote.
+            self.send_header("Cache-Control", "no-store")
             self.send_header("Content-Length", str(len(data)))
             self.end_headers()
             self.wfile.write(data)

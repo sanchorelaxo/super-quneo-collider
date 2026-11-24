@@ -132,7 +132,21 @@ test('padCorners reads its own channel (ch15 xCC/yCC, not ch14)', () => {
 
 test('controlFraction: an unmapped button is always dark', () => {
   const button = indexById(normalizeLayout(INLINE).controls).get('buttonButton9');
-  assertEqual(controlFraction(button, {}, { 15: { 100: true } }), 0, 'no binding -> dark');
+  assertEqual(controlFraction(button, {}, { 15: { 100: true } }), null, 'no binding -> null');
+});
+
+test('controlFraction: silence is null, a reported 0 is a position', () => {
+  const byId = indexById(normalizeLayout(INLINE).controls);
+  const rotary = byId.get('rotaryButton0');
+  const vslider = byId.get('vSliderButton0');
+  for (const control of [rotary, vslider]) {
+    assertEqual(controlFraction(control, {}, {}), null, `${control.id}: nothing reported -> null`);
+  }
+  // 0 is a real position on a ring and on the crossfader (their indicator
+  // lights at 0), so silence has to be distinguishable from position 0 or those
+  // controls stay aglow while the board sits dark.
+  assertEqual(controlFraction(rotary, { 14: { 1: 0 } }, {}), 0, 'a reported rotary 0 stays 0');
+  assertEqual(controlFraction(vslider, { 15: { 61: 0 } }, {}), 0, 'a reported slider 0 stays 0');
 });
 
 test('loadLayout reads the full 38-control board', async () => {

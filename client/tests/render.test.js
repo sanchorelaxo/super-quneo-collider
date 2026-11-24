@@ -208,3 +208,28 @@ test('a rotary renders a RING of segments with one red position indicator', asyn
     container.remove();
   }
 });
+
+test('no data at all leaves the ring and the crossfader dark', async () => {
+  const layout = await loadLayout('../LAYOUT.json');
+  const container = makeContainer();
+  const board = buildBoard(layout, container);
+  try {
+    const ring = board.lights.get('rotaryButton0');
+    const cross = board.lights.get('lSliderButton0');
+    ring.setLit(0.25);
+    cross.setLit(0.25);
+    assertEqual(ring.meshes.filter(lit).length, 1, 'the ring shows a position when it has one');
+    assertEqual(cross.meshes.filter(lit).length, 3, 'the crossfader shows its window');
+    // null is not position 0. It is "the board has reported nothing", and on a
+    // ring and on the crossfader position 0 is itself lit, so reading silence
+    // as 0 leaves both aglow while the hardware is dark. The page resets the
+    // board as it loads, and a reloaded board has nothing to report.
+    ring.setLit(null);
+    cross.setLit(null);
+    assertEqual(ring.meshes.filter(lit).length, 0, 'a ring with no data is dark');
+    assertEqual(cross.meshes.filter(lit).length, 0, 'a crossfader with no data is dark');
+  } finally {
+    board.dispose();
+    container.remove();
+  }
+});

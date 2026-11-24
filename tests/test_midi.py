@@ -216,6 +216,30 @@ class TestWatcherState:
         watcher.tick()
         assert wait_for(lambda: watcher.state()["note"].get(15, {}).get(36) is False)
 
+    def test_clear_forgets_the_cc_and_note_state(self, tmp_path):
+        # The board has just been reloaded, so nothing it reported before is
+        # true any more: the mirror that lights the UI has to go with it.
+        watcher, _ = make_watcher(
+            lines=[
+                " 24:0   Control change         15, controller 61, value 64",
+                " 24:0   Note on                15, note 36, velocity 127",
+            ],
+            tmp_path=tmp_path,
+        )
+        watcher.tick()
+        assert wait_for(lambda: watcher.state()["note"].get(15, {}).get(36) is True)
+        watcher.clear()
+        st = watcher.state()
+        assert st["cc"] == {} and st["note"] == {}
+        # Presence is not state: the port stays known across a clear.
+        assert st["present"] is True and st["port"] == "24:0"
+
+    def test_clear_is_harmless_before_anything_arrives(self, tmp_path):
+        watcher, _ = make_watcher(tmp_path=tmp_path)
+        watcher.clear()
+        assert watcher.state()["cc"] == {}
+        assert watcher.state()["note"] == {}
+
     def test_fires_on_note_for_channel_15(self, tmp_path):
         seen = []
         watcher, _ = make_watcher(
@@ -310,3 +334,19 @@ class TestPersistence:
         watcher, _ = make_watcher(tmp_path=tmp_path, state_file=state_file)
         assert watcher.state()["cc"] == {}
         assert watcher.state()["note"] == {}
+
+    def test_clear_writes_the_empty_state_to_disk(self, tmp_path):
+        # Without this, the next bridge start would light the UI from values the
+        # board no longer holds after a reset.
+        state_file = tmp_path / "quneo-state.json"
+        first, _ = make_watcher(
+            lines=[" 24:0   Control change         15, controller 61, value 64"],
+            tmp_path=tmp_path,
+            state_file=state_file,
+        )
+        first.tick()
+        assert wait_for(lambda: first.state()["cc"].get(15, {}).get(61) == 64)
+        first.clear()
+        second, _ = make_watcher(tmp_path=tmp_path, state_file=state_file)
+        assert second.state()["cc"] == {}
+        assert second.state()["note"] == {}

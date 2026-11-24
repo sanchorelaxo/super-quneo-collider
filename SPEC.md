@@ -61,13 +61,17 @@ UI. `bubbles` is the first and default member of that catalog, not the whole pro
 ```
 
 Numbers flow one way: QuNeo slider -> MIDI CC -> bridge -> (a) OSC into scsynth, and
-(b) JSON state into the three.js model. Nothing runs back to the board in this spec.
+(b) JSON state into the three.js model. One narrow exception, added after the spike:
+the admin reset (`POST /api/collider/reset`, plus the reset the page fires as it loads)
+sends the board a preset reload so a stale board can be blanked from the UI. It writes
+no preset and changes no mapping: slot 0, the configuration the board already runs, is
+re-selected.
 
 Preset loading is out of band: the `BasicSC_QuNeo` preset (or any custom preset we
 later design) reaches the board only for testing, driven by a test-only rig that starts
 queneo-editor's editor API server and flashes over its `/api/editor/send` endpoint (see
-D6). This project never writes to the QuNeo at runtime and contains no auto-flashing
-code.
+D6). Apart from the admin reset above, this project never writes to the QuNeo at runtime
+and contains no auto-flashing code.
 
 ---
 

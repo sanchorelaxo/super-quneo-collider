@@ -1,6 +1,9 @@
 import contextlib
 import json
+import os
+import sys
 import threading
+import time
 from http.client import HTTPConnection
 from pathlib import Path
 
@@ -12,7 +15,7 @@ from super_quneo_collider.map import (
     load_catalog,
     load_mapping,
 )
-from super_quneo_collider.server import ColliderApp, _build_server
+from super_quneo_collider.server import ColliderApp, _build_server, reexec_argv
 
 SRC = Path(__file__).resolve().parent.parent / "src" / "super_quneo_collider"
 MAPPING = SRC / "mapping.json"
@@ -35,6 +38,11 @@ class FakeMidi:
 
     def state(self):
         return self._state
+
+    def clear(self):
+        self.calls.append("clear")
+        self._state["cc"].clear()
+        self._state["note"].clear()
 
     def start(self):
         self.calls.append("start")
@@ -81,7 +89,23 @@ class FakeSc:
         self.calls.append(("stop",))
 
 
-def make_app(router=None, active=None, fade=True):
+class FakeBoard:
+    """The one write the bridge makes to the QuNeo.
+
+    Callable, so it drops in wherever the real ``board.darken`` goes, and it
+    can play dead the way an unplugged board does.
+    """
+
+    def __init__(self, accepts=True):
+        self.accepts = accepts
+        self.calls = 0
+
+    def __call__(self, *args, **kwargs):
+        self.calls += 1
+        return self.accepts
+
+
+def make_app(router=None, active=None, fade=True, darken=None, replace=None, http_port=8686):
     return ColliderApp(
         mapping=load_mapping(MAPPING),
         catalog=load_catalog(CATALOG),
@@ -91,6 +115,9 @@ def make_app(router=None, active=None, fade=True):
         router=router if router is not None else (lambda: []),
         active=active,
         fade=fade,
+        darken=darken,
+        replace=replace,
+        http_port=http_port,
     )
 
 
@@ -379,8 +406,8 @@ def test_start_routes_audio():
 
 
 @contextlib.contextmanager
-def running_server():
-    app = make_app()
+def running_server(**kwargs):
+    app = make_app(**kwargs)
     server = _build_server(app, "127.0.0.1", 0)
     port = server.server_address[1]
     thread = threading.Thread(target=server.serve_forever, daemon=True)
@@ -390,6 +417,16 @@ def running_server():
     finally:
         server.shutdown()
         thread.join(timeout=2)
+
+
+def wait_until(predicate, timeout=2.0):
+    """Poll until ``predicate`` holds: for work that leaves the request behind."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if predicate():
+            return True
+        time.sleep(0.01)
+    return predicate()
 
 
 def _request(port, method, path, payload=None):
@@ -465,6 +502,21 @@ def test_static_js_content_type():
         status, ctype, _body = _request(port, "GET", "/src/board.js")
         assert status == 200
         assert ctype == "text/javascript"
+
+
+def test_static_files_are_served_without_caching():
+    # The client is plain ES modules read from disk, so a reload has to pick up
+    # the edited file.  Left to the browser's own heuristics it reuses the copy
+    # it already has, and the page silently runs the code from before the edit.
+    with running_server() as (port, _app):
+        conn = HTTPConnection("127.0.0.1", port, timeout=3)
+        try:
+            conn.request("GET", "/index.html")
+            resp = conn.getresponse()
+            assert resp.status == 200
+            assert resp.getheader("Cache-Control") == "no-store"
+        finally:
+            conn.close()
 
 
 def test_static_json_content_type():
@@ -668,3 +720,135 @@ def test_status_reports_onset_per_example():
     assert by_id["hoover"]["onset"] == "note"
     assert by_id["bubbles"]["onset"] == "cc"
     assert by_id["gabberkick"]["onset"] == "cc"
+
+
+# --- resetting the board ---------------------------------------------------
+
+
+def test_reset_writes_the_board_to_dark():
+    board = FakeBoard()
+    app = make_app(darken=board)
+    assert app.reset_board() is True
+    assert board.calls == 1
+
+
+def test_reset_forgets_what_the_board_reported_before():
+    # The board does not hold those values any more, so the mirror that lights
+    # the UI must not keep showing them.
+    app = make_app()
+    app.midi._state["cc"] = {15: {61: 64}}
+    app.midi._state["note"] = {15: {36: True}}
+    app.reset_board()
+    st = app.status()
+    assert st["cc"] == {} and st["note"] == {}
+
+
+def test_reset_reports_a_board_that_did_not_answer():
+    app = make_app(darken=FakeBoard(accepts=False))
+    assert app.reset_board() is False
+
+
+def test_reset_forgets_the_state_even_when_the_board_is_absent():
+    # An unplugged board: the three.js board still has to go dark.
+    app = make_app(darken=FakeBoard(accepts=False))
+    app.midi._state["note"] = {15: {36: True}}
+    app.reset_board()
+    assert app.status()["note"] == {}
+
+
+def test_reset_is_safe_to_repeat():
+    board = FakeBoard()
+    app = make_app(darken=board)
+    assert app.reset_board() is True
+    assert app.reset_board() is True
+    assert board.calls == 2
+
+
+def test_api_reset_darkens_the_board_and_clears_the_state():
+    board = FakeBoard()
+    with running_server(darken=board) as (port, app):
+        app.midi._state["note"] = {15: {36: True}}
+        status, _ctype, body = _request(port, "POST", "/api/collider/reset", {})
+        assert status == 200
+        assert board.calls == 1
+        assert json.loads(body)["note"] == {}
+
+
+def test_api_reset_reports_a_board_that_did_not_answer():
+    with running_server(darken=FakeBoard(accepts=False)) as (port, _app):
+        status, _ctype, body = _request(port, "POST", "/api/collider/reset", {})
+        assert status == 400
+        assert "error" in json.loads(body)
+
+
+def test_api_reset_ignores_a_query_string():
+    with running_server() as (port, _app):
+        status, _ctype, _body = _request(port, "POST", "/api/collider/reset?t=1", {})
+        assert status == 200
+
+
+# --- restarting the bridge -------------------------------------------------
+
+
+def test_status_reports_the_pid_and_uptime_the_client_polls_for():
+    st = make_app().status()
+    assert st["pid"] == os.getpid()
+    assert st["uptime_s"] >= 0
+
+
+def test_status_reports_a_boot_id_that_holds_while_this_process_lives():
+    # A restart hands the process image over (os.execve), so the pid is the same
+    # one when it comes back: the client needs something that changes with the
+    # process image to know the new copy is the one answering.
+    app = make_app()
+    first = app.status()["boot"]
+    assert isinstance(first, str) and first
+    assert app.status()["boot"] == first
+
+
+def test_reexec_argv_names_this_module_in_this_interpreter():
+    # A file path or a shebang would depend on the working directory; -m does not.
+    assert reexec_argv() == [sys.executable, "-m", "super_quneo_collider.server"]
+
+
+def test_restart_hands_over_after_a_beat():
+    calls = []
+    app = make_app(replace=lambda: calls.append("replace"))
+    app.restart(delay=0.01)
+    assert wait_until(lambda: calls == ["replace"])
+
+
+def test_restart_stops_the_supercollider_child_first():
+    # scsynth holds its port until the child is gone; the bridge that comes back
+    # has to be able to boot its own server.
+    calls = []
+    app = make_app(replace=lambda: calls.append("replace"))
+    app.restart(delay=0.01)
+    assert wait_until(lambda: calls == ["replace"])
+    assert ("stop",) in app.sc.calls
+
+
+def test_restart_refuses_a_bridge_on_an_ephemeral_port():
+    # It would come back on a different port and the page could never find it.
+    app = make_app(http_port=0, replace=lambda: pytest.fail("must not hand over"))
+    assert app.restart(delay=0.01) == "cannot restart a bridge that is on an ephemeral port"
+
+
+def test_api_restart_answers_before_the_process_is_replaced():
+    calls = []
+    with running_server(replace=lambda: calls.append("replace")) as (port, _app):
+        status, _ctype, body = _request(port, "POST", "/api/collider/restart", {})
+        assert status == 200
+        assert json.loads(body)["present"] is True  # a real status, answered first
+        assert calls == []  # the reply left before the hand-over
+        assert wait_until(lambda: calls == ["replace"])
+
+
+def test_api_restart_reports_a_bridge_that_cannot_hand_over():
+    with running_server(http_port=0, replace=lambda: pytest.fail("must not hand over")) as (
+        port,
+        _app,
+    ):
+        status, _ctype, body = _request(port, "POST", "/api/collider/restart", {})
+        assert status == 400
+        assert "ephemeral" in json.loads(body)["error"]

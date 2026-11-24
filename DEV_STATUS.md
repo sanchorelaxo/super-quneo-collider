@@ -11,7 +11,45 @@ Last updated: 2026-11-24
   MIDI state from the bridge — not just the 3 synth-bound sliders. A pad pressed
   on the real board lights the same pad on the model, in the same orientation
   and brightness, and the state survives a bridge restart.
-- Backend: **138** pytest green. Frontend: **49** browser-harness tests green.
+- Backend: **178** pytest green. Frontend: **62** browser-harness tests green.
+
+## Board reset + bridge restart from the client — landed 2026-11-24
+
+Two buttons in the bottom-right corner of the client, plus one automatic reset.
+
+- **Reset Board** (`POST /api/collider/reset`) blanks the physical board and the
+  three.js model together. The write is the 17-byte preset-reload SysEx
+  (`board.darken()`, `amidi -p <port> -S <hex>`, slot 0). That is the only command
+  that clears the rotaries and the long crossfader: a remote all-off CC/note sweep
+  leaves those four lit, because the board drives them locally. When the board is
+  untouched the reload emits no CC/note at all, so it adds nothing the bridge would
+  misread; the board answers by blinking pad 1 (slot 0 loaded). The route is
+  idempotent, clears the mirrored CC/note (`MidiWatcher.clear()`) so the model and
+  the hardware agree, and answers 400 with `{"error": ...}` when the board does not
+  answer. The write lives in `board.py` alone: `midi.py` stays the read side.
+- **Restart Server** (`POST /api/collider/restart`) replaces the bridge process. It
+  stops the SuperCollider child first (scsynth holds 57110), answers the HTTP request
+  before the hand-over, then `execve`s the same interpreter and module. `execve` keeps
+  the pid (measured: pid 359749 before and after), so the pid cannot be the tell:
+  `status()` reports a `boot` id (`os.urandom(4).hex()`, new per process) and the
+  button stays disabled until a *different* boot id answers the poll, falling back to
+  a pid swap for a bridge too old to report one. A bridge on an ephemeral HTTP port
+  is refused: there would be no address to restart on. Measured hand-over: ~8.3 s
+  from click to a usable bridge, with the status pill reporting `bridge offline` in
+  the gap and then `live`.
+- **Reset on load:** the page resets the board as it mounts. Without it a reload
+  lights the model from the CC/note the bridge reloaded from its state file, while
+  the hardware still holds whatever the last session left lit, so view and board
+  disagree on the first poll. Measured after a restart: the bridge reported one CC
+  channel (15) and one note channel of stale state, and the reset cleared both.
+- Both buttons ride the existing 500 ms status poll. `client/src/admin.js` takes its
+  calls and hooks injected, so the harness tests the whole state machine with no
+  bridge and no fetch.
+- Static files are served `Cache-Control: no-store`. The client is plain ES modules
+  read from disk with no build step; without the header an edited module followed by
+  a reload silently ran the pre-edit copy, which is how the harness first appeared to
+  hang. The bridge serves the client directory, so the harness is also reachable as
+  `/tests/index.html` while the bridge runs.
 
 ## Corner triggers + doc examples (§9.6/§9.7) — landed 2026-11-23
 
@@ -75,15 +113,17 @@ Licences (§9.9.4): `LICENSE.dxkSynthDefs` and `LICENSE.sInstruments` sit beside
 fragments they cover (both upstreams are GPL-3.0). Sources shipped without a licence keep
 their upstream URL and author in the fragment header; clear those before any public release.
 
-Operational: the bridge snapshots `catalog.json` at startup and has no restart route, so a
-bridge that was already running when `--write` / `--prune` rewrote the files keeps serving
-its boot-time catalog. Restart the bridge after any catalog or def change.
+Operational: the bridge snapshots `catalog.json` at startup, so a bridge that was already
+running when `--write` / `--prune` rewrote the files keeps serving its boot-time catalog.
+Restart the bridge after any catalog or def change: `POST /api/collider/restart`, or the
+"Restart Server" button in the bottom-right corner of the client (see the reset/restart
+section above).
 
 Still open: the def `<select>` lists all 208 in one flat list. Group it into families
 (the §9.9.1 collections) once the list gets hard to scroll.
 
-Backend suite: **138** pytest green (down from 140 — the four def-specific tests for pruned
-defs went away, and the four catalog tests now derive from `catalog.json`).
+Backend suite at that point: **138** pytest green (down from 140 — the four def-specific
+tests for pruned defs went away, and the four catalog tests now derive from `catalog.json`).
 
 ## Milestone detail (full-board lit-state mirror)
 

@@ -80,20 +80,28 @@ export function ccFraction(value) {
  *
  * Continuous controls (sliders/rotaries) read their locCC; binary controls
  * (buttons) light while their note is on. Pads are handled separately by
- * padCorners(). Anything without a binding (e.g. an unmapped button)
- * returns 0 and stays dark.
+ * padCorners().
+ *
+ * A control the board has not reported at all returns null, which the renderer
+ * draws dark. Silence is NOT 0: 0 is a real position on a rotary ring and on
+ * the crossfader (their indicator lights there), so reading "nothing reported"
+ * as 0 leaves those controls aglow while the hardware sits dark — exactly the
+ * state a board reset leaves behind. An unbound control (e.g. an unmapped
+ * button) is also null: the board will never report it.
  */
 export function controlFraction(control, cc, note) {
   const ch = control.channel;
   if (CONTINUOUS_KINDS.has(control.kind) && control.locCC != null) {
     const chCC = (cc && cc[ch]) || {};
-    return ccFraction(chCC[control.locCC] ?? 0);
+    const raw = chCC[control.locCC];
+    return Number.isFinite(raw) ? ccFraction(raw) : null;
   }
   if (BINARY_KINDS.has(control.kind) && control.noteNum != null) {
     const chNote = (note && note[ch]) || {};
-    return chNote[control.noteNum] === true ? 1 : 0;
+    const raw = chNote[control.noteNum];
+    return raw == null ? null : (raw ? 1 : 0);
   }
-  return 0;
+  return null;
 }
 
 /**

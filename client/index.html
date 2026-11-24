@@ -34,6 +34,22 @@
     padding: 6px 10px; border-radius: 4px;
   }
   #status.offline { color: #ff7b72; }
+  #admin {
+    position: fixed; right: 12px; bottom: 12px; z-index: 10;
+    display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+    font: 12px/1.4 monospace; color: #d8d8e0;
+  }
+  #admin .row { display: flex; gap: 6px; }
+  #admin button {
+    font: inherit; background: #101014; color: #d8d8e0;
+    border: 1px solid #33333f; border-radius: 3px; padding: 4px 10px;
+    cursor: pointer;
+  }
+  #admin button:hover:enabled { border-color: #7dd67d; color: #7dd67d; }
+  #admin button:disabled { opacity: 0.45; cursor: default; }
+  #admin-note { color: #9a9ab0; min-height: 1.4em; }
+  #admin-note.ok { color: #7dd67d; }
+  #admin-note.bad { color: #ff7b72; }
 </style>
 </head>
 <body>
@@ -50,12 +66,20 @@
   <pre id="helper"></pre>
 </div>
 <div id="status">connecting&hellip;</div>
+<div id="admin">
+  <div id="admin-note"></div>
+  <div class="row">
+    <button type="button" id="admin-restart">Restart Server</button>
+    <button type="button" id="admin-reset">Reset Board</button>
+  </div>
+</div>
 <script type="module">
 import { loadLayout } from './src/board.js';
 import { ColliderPane } from './src/pane.js';
 import { buildBoard } from './src/render.js';
-import { getState } from './src/api.js';
+import { getState, resetBoard, restartServer } from './src/api.js';
 import { mountExamplePicker } from './src/examples.js';
+import { mountAdmin } from './src/admin.js';
 
 const container = document.getElementById('board');
 const statusEl = document.getElementById('status');
@@ -82,12 +106,28 @@ const renderPicker = mountExamplePicker({
   fade: fadeEl,
 });
 
+// The two buttons in the bottom right corner.  "Reset Board" blanks the board
+// and darkens the pane with it; "Restart Server" replaces the bridge process,
+// and that button clears itself once a freshly booted bridge answers the poll
+// below.  resetOnLoad: a page load resets the board, so opening the page always
+// starts dark instead of lit from the state the bridge kept.
+const admin = mountAdmin(
+  {
+    reset: document.getElementById('admin-reset'),
+    restart: document.getElementById('admin-restart'),
+    note: document.getElementById('admin-note'),
+  },
+  { resetBoard, restartServer },
+  { onReset: () => pane.clearLit(), resetOnLoad: true },
+);
+
 async function tick() {
   try {
     const state = await pane.poll(getState);
     statusEl.className = state.present ? '' : 'offline';
     statusEl.textContent = state.present ? 'live' : 'waiting for bridge&hellip;';
     renderPicker(state);
+    admin.observe(state);
   } catch (err) {
     statusEl.className = 'offline';
     statusEl.textContent = 'bridge offline — ' + err.message;

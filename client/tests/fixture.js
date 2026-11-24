@@ -14,7 +14,11 @@ export function stubFetch({ routes = {}, calls = null } = {}) {
   globalThis.fetch = async (url, opts) => {
     if (calls) calls.push({ url, opts });
     for (const [pattern, handler] of Object.entries(routes)) {
-      if (String(url).includes(pattern)) return jsonResponse(handler);
+      if (String(url).includes(pattern)) {
+        // A route may hand back a ready Response, so a test can serve a refusal
+        // (status + body) as easily as a payload.
+        return handler instanceof Response ? handler : jsonResponse(handler);
+      }
     }
     return jsonResponse({});
   };

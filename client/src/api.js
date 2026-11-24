@@ -43,3 +43,40 @@ export async function setFade(enabled, url = '/api/collider/fade') {
   }
   return res.json();
 }
+
+// The two admin buttons in the page's bottom right corner. Both are POSTs with
+// nothing to say beyond "do it", so they share one call. A refusal comes back
+// as a 4xx carrying the reason ("the board did not accept the reset"), which is
+// what the button shows; a success answers with the bridge's state.
+async function postControl(path, what) {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+  if (!res.ok) {
+    let why = `${res.status} ${res.statusText}`;
+    try {
+      const detail = await res.json();
+      if (detail && detail.error) why = detail.error;
+    } catch {
+      /* not JSON: the status line is all we know */
+    }
+    throw new Error(`${what}: ${why}`);
+  }
+  return res.json();
+}
+
+// Reload the board's preset: every LED goes out, rotaries and cross fader
+// included, and the bridge forgets the state it had mirrored so the UI does not
+// keep lighting up from values the board no longer holds.
+export function resetBoard(url = '/api/collider/reset') {
+  return postControl(url, 'resetting the board failed');
+}
+
+// Replace the bridge process. It answers before it goes, so a success only
+// means the hand-over was accepted; the page sees the new process appear as a
+// fresh pid (and a small uptime) on its next poll.
+export function restartServer(url = '/api/collider/restart') {
+  return postControl(url, 'restarting the bridge failed');
+}
