@@ -6,7 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from super_quneo_collider.map import helper_lines, load_catalog, load_mapping
+from super_quneo_collider.map import (
+    example_ids,
+    helper_lines,
+    load_catalog,
+    load_mapping,
+)
 from super_quneo_collider.server import ColliderApp, _build_server
 
 SRC = Path(__file__).resolve().parent.parent / "src" / "super_quneo_collider"
@@ -105,23 +110,8 @@ def test_status_shape():
 
 def test_status_lists_all_examples():
     st = make_app().status()
-    assert [e["id"] for e in st["examples"]] == [
-        "bubbles",
-        "formant",
-        "sine",
-        "simpleFM",
-        "chainsaw",
-        "drummer",
-        "gabberkick",
-        "hoover",
-        "abstractDrum",
-        "kalimba",
-        "marimba1",
-        "modalMarimba",
-        "pmCrotales",
-        "steelDrum",
-        "xylophone",
-    ]
+    # the catalog is the source of truth; status must expose it in catalog order
+    assert [e["id"] for e in st["examples"]] == example_ids(load_catalog(CATALOG))
 
 
 def test_every_example_declares_a_def_source_and_gesture():
@@ -425,23 +415,9 @@ def test_api_collider_lists_the_examples():
     with running_server() as (port, _app):
         _status, _ctype, body = _request(port, "GET", "/api/collider")
         payload = json.loads(body)
-        assert [e["id"] for e in payload["examples"]] == [
-            "bubbles",
-            "formant",
-            "sine",
-            "simpleFM",
-            "chainsaw",
-            "drummer",
-            "gabberkick",
-            "hoover",
-            "abstractDrum",
-            "kalimba",
-            "marimba1",
-            "modalMarimba",
-            "pmCrotales",
-            "steelDrum",
-            "xylophone",
-        ]
+        assert [e["id"] for e in payload["examples"]] == example_ids(
+            load_catalog(CATALOG)
+        )
         assert payload["activeExample"] == "bubbles"
 
 

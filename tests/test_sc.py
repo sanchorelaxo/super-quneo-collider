@@ -34,7 +34,11 @@ def test_def_scripts_cover_every_catalog_example():
     )
     defs = tuple(v["def"] for v in catalog["examples"].values())
     assert DEF_NAMES == tuple(defs)
-    assert len(DEF_NAMES) == 15
+    # D7: every name in the tuple resolves to a fragment shipped beside sc.py.
+    frag_dir = Path(__file__).resolve().parent.parent / "src" / "super_quneo_collider"
+    assert DEF_NAMES
+    for name in DEF_NAMES:
+        assert (frag_dir / f"{name}.scd").is_file()
 
 
 def test_resolve_scsynth_exists():
@@ -67,7 +71,9 @@ def test_load_defs_delivers_all_examples():
         assert s.boot() is True
         assert s.load_defs() is True
         st = s.status()
-        assert st["numDefs"] >= len(DEF_NAMES)
+        # exactly, not "at least": a def the server refuses to receive is the
+        # bug this catches, and it shows up as a shortfall, never a surplus.
+        assert st and st["numDefs"] == len(DEF_NAMES)
     finally:
         s.stop()
 

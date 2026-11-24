@@ -97,7 +97,9 @@ def test_scale_value_int_rounds_to_whole_counts():
 # --- the catalog ---------------------------------------------------------
 
 def test_catalog_lists_all_examples(catalog):
-    assert example_ids(catalog) == [
+    ids = example_ids(catalog)
+    # The §9.1-§9.8 baseline still opens the catalog, in order ...
+    assert ids[:15] == [
         "bubbles",
         "formant",
         "sine",
@@ -114,6 +116,11 @@ def test_catalog_lists_all_examples(catalog):
         "steelDrum",
         "xylophone",
     ]
+    # ... the §9.9 import appended to it, and every entry ships exactly one
+    # fragment under its own name, with no repeats (§9.9.1).
+    assert len(ids) > 15
+    assert len(ids) == len(set(ids))
+    assert set(ids) <= {p.stem for p in SRC.glob("*.scd")}
 
 
 def test_catalog_onset_and_gesture_distinguish_drones_from_one_shots(catalog):

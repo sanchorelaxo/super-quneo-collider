@@ -6,9 +6,33 @@
       "source": "bubbles.js",
       "gesture": "continuous",
       "params": [
-        {"name": "wobble",      "control": "vSliderButton0", "cc": 61, "min": 0.0, "max": 10.0, "curve": "lin", "default": 0.4},
-        {"name": "innerWobble", "control": "vSliderButton1", "cc": 69, "min": 0.0, "max": 16.0, "curve": "lin", "default": 8},
-        {"name": "releaseTime", "control": "vSliderButton2", "cc": 77, "min": 2.0, "max": 6.0,  "curve": "lin", "default": 4}
+        {
+          "name": "wobble",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 10.0,
+          "curve": "lin",
+          "default": 0.4
+        },
+        {
+          "name": "innerWobble",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 16.0,
+          "curve": "lin",
+          "default": 8
+        },
+        {
+          "name": "releaseTime",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 2.0,
+          "max": 6.0,
+          "curve": "lin",
+          "default": 4
+        }
       ]
     },
     "formant": {
@@ -16,11 +40,52 @@
       "source": "formant.scd",
       "gesture": "continuous",
       "params": [
-        {"name": "fundfreq",    "control": "vSliderButton0", "cc": 61, "min": 40,  "max": 10240, "curve": "exp", "default": 440},
-        {"name": "formantfreq", "control": "vSliderButton1", "cc": 69, "min": 40,  "max": 10240, "curve": "exp", "default": 440},
-        {"name": "bwfreq",      "control": "vSliderButton2", "cc": 77, "min": 40,  "max": 10240, "curve": "exp", "default": 100},
-        {"name": "timeScale",   "control": "vSliderButton3", "cc": 85, "min": 0.1, "max": 4.0,   "curve": "lin", "default": 1},
-        {"name": "pan",         "control": "rotaryButton0",  "cc": 1, "channel": 14, "min": -1, "max": 1, "curve": "lin", "default": 0}
+        {
+          "name": "fundfreq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40,
+          "max": 10240,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "formantfreq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40,
+          "max": 10240,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "bwfreq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40,
+          "max": 10240,
+          "curve": "exp",
+          "default": 100
+        },
+        {
+          "name": "timeScale",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "pan",
+          "control": "rotaryButton0",
+          "cc": 1,
+          "channel": 14,
+          "min": -1,
+          "max": 1,
+          "curve": "lin",
+          "default": 0
+        }
       ]
     },
     "sine": {
@@ -28,7 +93,15 @@
       "source": "sine-wave.js",
       "gesture": "continuous",
       "params": [
-        {"name": "freq", "control": "vSliderButton0", "cc": 61, "min": 40, "max": 2000, "curve": "exp", "default": 440}
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40,
+          "max": 2000,
+          "curve": "exp",
+          "default": 440
+        }
       ]
     },
     "simpleFM": {
@@ -37,7 +110,15 @@
       "gesture": "continuous",
       "onset": "select",
       "params": [
-        {"name": "modRate", "control": "vSliderButton0", "cc": 61, "min": 0.1, "max": 20, "curve": "exp", "default": 1}
+        {
+          "name": "modRate",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20,
+          "curve": "exp",
+          "default": 1
+        }
       ]
     },
     "chainsaw": {
@@ -46,7 +127,15 @@
       "gesture": "continuous",
       "onset": "select",
       "params": [
-        {"name": "amp", "control": "vSliderButton0", "cc": 61, "min": 0.0, "max": 1.0, "curve": "lin", "default": 0.3}
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.3
+        }
       ]
     },
     "drummer": {
@@ -55,7 +144,15 @@
       "gesture": "continuous",
       "onset": "select",
       "params": [
-        {"name": "tempo", "control": "vSliderButton0", "cc": 61, "min": 0.5, "max": 16, "curve": "exp", "default": 4}
+        {
+          "name": "tempo",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.5,
+          "max": 16,
+          "curve": "exp",
+          "default": 4
+        }
       ]
     },
     "gabberkick": {
@@ -63,7 +160,15 @@
       "source": "examples.html",
       "gesture": "oneshot",
       "params": [
-        {"name": "bend", "control": "vSliderButton3", "cc": 85, "min": 0.4, "max": 1.0, "curve": "lin", "default": 1}
+        {
+          "name": "bend",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.4,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
       ]
     },
     "hoover": {
@@ -72,7 +177,15 @@
       "gesture": "continuous",
       "onset": "note",
       "params": [
-        {"name": "freq", "control": "vSliderButton0", "cc": 61, "min": 40, "max": 2000, "curve": "exp", "default": 440}
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40,
+          "max": 2000,
+          "curve": "exp",
+          "default": 440
+        }
       ]
     },
     "abstractDrum": {
@@ -80,7 +193,15 @@
       "source": "SCLOrkSynths/percussion",
       "gesture": "oneshot",
       "params": [
-        {"name": "decCoef", "control": "vSliderButton3", "cc": 85, "min": 0.01, "max": 1.0, "curve": "lin", "default": 0.15}
+        {
+          "name": "decCoef",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.01,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.15
+        }
       ]
     },
     "kalimba": {
@@ -88,7 +209,15 @@
       "source": "SCLOrkSynths/percussion",
       "gesture": "oneshot",
       "params": [
-        {"name": "rel", "control": "vSliderButton3", "cc": 85, "min": 0.5, "max": 8.0, "curve": "exp", "default": 3}
+        {
+          "name": "rel",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.5,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 3
+        }
       ]
     },
     "marimba1": {
@@ -96,7 +225,15 @@
       "source": "SCLOrkSynths/percussion",
       "gesture": "oneshot",
       "params": [
-        {"name": "rq", "control": "vSliderButton3", "cc": 85, "min": 0.001, "max": 0.5, "curve": "exp", "default": 0.02}
+        {
+          "name": "rq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.001,
+          "max": 0.5,
+          "curve": "exp",
+          "default": 0.02
+        }
       ]
     },
     "modalMarimba": {
@@ -104,7 +241,15 @@
       "source": "SCLOrkSynths/percussion",
       "gesture": "oneshot",
       "params": [
-        {"name": "position", "control": "vSliderButton3", "cc": 85, "min": 0.0, "max": 1.0, "curve": "lin", "default": 0.414}
+        {
+          "name": "position",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.414
+        }
       ]
     },
     "pmCrotales": {
@@ -112,7 +257,15 @@
       "source": "SCLOrkSynths/percussion",
       "gesture": "oneshot",
       "params": [
-        {"name": "tone", "control": "vSliderButton3", "cc": 85, "min": 0.5, "max": 12.0, "curve": "exp", "default": 3}
+        {
+          "name": "tone",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.5,
+          "max": 12.0,
+          "curve": "exp",
+          "default": 3
+        }
       ]
     },
     "steelDrum": {
@@ -120,7 +273,15 @@
       "source": "SCLOrkSynths/percussion",
       "gesture": "oneshot",
       "params": [
-        {"name": "dec", "control": "vSliderButton3", "cc": 85, "min": 0.3, "max": 4.0, "curve": "exp", "default": 1.5}
+        {
+          "name": "dec",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.3,
+          "max": 4.0,
+          "curve": "exp",
+          "default": 1.5
+        }
       ]
     },
     "xylophone": {
@@ -128,7 +289,6226 @@
       "source": "SCLOrkSynths/percussion",
       "gesture": "oneshot",
       "params": [
-        {"name": "rel", "control": "vSliderButton3", "cc": 85, "min": 0.5, "max": 8.0, "curve": "exp", "default": 2}
+        {
+          "name": "rel",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.5,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 2
+        }
+      ]
+    },
+    "acid309": {
+      "def": "acid309",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "bass8": {
+      "def": "bass8",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 200
+        }
+      ]
+    },
+    "cs80lead": {
+      "def": "cs80lead",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 880
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "attack",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.75
+        }
+      ]
+    },
+    "fmtribe": {
+      "def": "fmtribe",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "attack",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.1
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.3
+        }
+      ]
+    },
+    "basicFM": {
+      "def": "basicFM",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "carFreq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 4000.0,
+          "curve": "lin",
+          "default": 1000
+        },
+        {
+          "name": "modFreq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 400.0,
+          "curve": "lin",
+          "default": 100
+        }
+      ]
+    },
+    "ambi": {
+      "def": "ambi",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "bell": {
+      "def": "bell",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "room",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 2.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "blip": {
+      "def": "blip",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "bug": {
+      "def": "bug",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "dbass": {
+      "def": "dbass",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "donk": {
+      "def": "donk",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "dub": {
+      "def": "dub",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "glass": {
+      "def": "glass",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "keys": {
+      "def": "keys",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "klank": {
+      "def": "klank",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "nylon": {
+      "def": "nylon",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "vib",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "fmod",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        }
+      ]
+    },
+    "pads": {
+      "def": "pads",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "piano": {
+      "def": "piano",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "pluck": {
+      "def": "pluck",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "prophet": {
+      "def": "prophet",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1.0
+        },
+        {
+          "name": "lforate",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "sawbass": {
+      "def": "sawbass",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.2
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        }
+      ]
+    },
+    "scatter": {
+      "def": "scatter",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "soft": {
+      "def": "soft",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "soprano": {
+      "def": "soprano",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "spark": {
+      "def": "spark",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "viola": {
+      "def": "viola",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "vib",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 24.0,
+          "curve": "lin",
+          "default": 6
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "verb",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.32,
+          "curve": "lin",
+          "default": 0.33
+        }
+      ]
+    },
+    "pbass": {
+      "def": "pbass",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 200
+        }
+      ]
+    },
+    "rhodes": {
+      "def": "rhodes",
+      "source": "diegodorado/tidal-synths",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "bass": {
+      "def": "bass",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 1000
+        }
+      ]
+    },
+    "enotamboura": {
+      "def": "enotamboura",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "feedback",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.07
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 100
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.3
+        }
+      ]
+    },
+    "fm": {
+      "def": "fm",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 500
+        },
+        {
+          "name": "mRatio",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "cRatio",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxt": {
+      "def": "dxt",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "lfofreq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "lfodepth",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        }
+      ]
+    },
+    "fm7": {
+      "def": "fm7",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "fm7algo": {
+      "def": "fm7algo",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.3
+        },
+        {
+          "name": "spread",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        }
+      ]
+    },
+    "moogbass": {
+      "def": "moogbass",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "attackTime",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.2
+        }
+      ]
+    },
+    "sc303": {
+      "def": "sc303",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "wave",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "pw",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "supermandolin": {
+      "def": "supermandolin",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0.2
+        }
+      ]
+    },
+    "supergong": {
+      "def": "supergong",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "voice",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        }
+      ]
+    },
+    "superpiano": {
+      "def": "superpiano",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "velocity",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0.1
+        }
+      ]
+    },
+    "superhex": {
+      "def": "superhex",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "rate",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "superkick": {
+      "def": "superkick",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "n",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "pitch1",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "super808": {
+      "def": "super808",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "rate",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "voice",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        }
+      ]
+    },
+    "superhat": {
+      "def": "superhat",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "n",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "supersnare": {
+      "def": "supersnare",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "n",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "superclap": {
+      "def": "superclap",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "rate",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "n",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "supersiren": {
+      "def": "supersiren",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "supersquare": {
+      "def": "supersquare",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "rate",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "supersaw": {
+      "def": "supersaw",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "rate",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "superpwm": {
+      "def": "superpwm",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "rate",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "supercomparator": {
+      "def": "supercomparator",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "rate",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "superchip": {
+      "def": "superchip",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "rate",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "supernoise": {
+      "def": "supernoise",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "slide",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        }
+      ]
+    },
+    "superfork": {
+      "def": "superfork",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "superhammond": {
+      "def": "superhammond",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "supervibe": {
+      "def": "supervibe",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "superhoover": {
+      "def": "superhoover",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "superzow": {
+      "def": "superzow",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "superstatic": {
+      "def": "superstatic",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "sustain",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "supergrind": {
+      "def": "supergrind",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "superwavemechanics": {
+      "def": "superwavemechanics",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "supertron": {
+      "def": "supertron",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "voice",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        }
+      ]
+    },
+    "superreese": {
+      "def": "superreese",
+      "source": "loopier/synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "theremin": {
+      "def": "theremin",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "mod",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 28.0,
+          "curve": "lin",
+          "default": 7
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        }
+      ]
+    },
+    "winwood": {
+      "def": "winwood",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 8000
+        }
+      ]
+    },
+    "wobble": {
+      "def": "wobble",
+      "source": "loopier/synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1.0
+        },
+        {
+          "name": "lforate",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 10
+        }
+      ]
+    },
+    "sinenv": {
+      "def": "sinenv",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "atk",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.1
+        }
+      ]
+    },
+    "dfm1": {
+      "def": "dfm1",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "mul",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 2.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "res",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "bpfsaw": {
+      "def": "bpfsaw",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "atk",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 2
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "rel",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 3
+        }
+      ]
+    },
+    "henon": {
+      "def": "henon",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "a",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 5.2,
+          "curve": "lin",
+          "default": 1.3
+        },
+        {
+          "name": "b",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.2,
+          "curve": "lin",
+          "default": 0.3
+        }
+      ]
+    },
+    "henonc": {
+      "def": "henonc",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "a",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 5.2,
+          "curve": "lin",
+          "default": 1.3
+        },
+        {
+          "name": "b",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.2,
+          "curve": "lin",
+          "default": 0.3
+        }
+      ]
+    },
+    "sinfb": {
+      "def": "sinfb",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "atk",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        }
+      ]
+    },
+    "ring1": {
+      "def": "ring1",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "f",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 180.0,
+          "curve": "lin",
+          "default": 45
+        },
+        {
+          "name": "a",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 36.0,
+          "curve": "lin",
+          "default": 9
+        },
+        {
+          "name": "d",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 2.4,
+          "curve": "lin",
+          "default": 0.6
+        }
+      ]
+    },
+    "ring2": {
+      "def": "ring2",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "f",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 36000.0,
+          "curve": "lin",
+          "default": 9000
+        },
+        {
+          "name": "a",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 8.0,
+          "curve": "lin",
+          "default": 2
+        },
+        {
+          "name": "d",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "ring3": {
+      "def": "ring3",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "f",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 200.0,
+          "curve": "lin",
+          "default": 50
+        },
+        {
+          "name": "a",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 12.0,
+          "curve": "lin",
+          "default": 3
+        },
+        {
+          "name": "d",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "ring4": {
+      "def": "ring4",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "f",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 32000.0,
+          "curve": "lin",
+          "default": 8000
+        },
+        {
+          "name": "a",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "d",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.2,
+          "curve": "lin",
+          "default": 0.3
+        }
+      ]
+    },
+    "pulse3": {
+      "def": "pulse3",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "atk",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "sinfb3": {
+      "def": "sinfb3",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "atk",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "saw3": {
+      "def": "saw3",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "atk",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "tri3": {
+      "def": "tri3",
+      "source": "theseanco/awesome-synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "atk",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "PMCrotale": {
+      "def": "PMCrotale",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 261
+        },
+        {
+          "name": "tone",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 12.0,
+          "curve": "lin",
+          "default": 3
+        },
+        {
+          "name": "art",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "apad_mh": {
+      "def": "apad_mh",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 880
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "attack",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.4
+        }
+      ]
+    },
+    "babblingbrook_jmc": {
+      "def": "babblingbrook_jmc",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "bassfoundation": {
+      "def": "bassfoundation",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 1000
+        }
+      ]
+    },
+    "basshighend": {
+      "def": "basshighend",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 3000
+        }
+      ]
+    },
+    "beating": {
+      "def": "beating",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "art",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "blowbotl": {
+      "def": "blowbotl",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1.0
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 20
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "bowed": {
+      "def": "bowed",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1.0
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 420
+        },
+        {
+          "name": "bowOffset",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.0
+        }
+      ]
+    },
+    "cheappiano": {
+      "def": "cheappiano",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "dur",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "clap_oto309": {
+      "def": "clap_oto309",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "cymbal808_ryan": {
+      "def": "cymbal808_ryan",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "baseFreq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1200.0,
+          "curve": "lin",
+          "default": 300
+        },
+        {
+          "name": "time",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 250
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "cymbalic_mcld": {
+      "def": "cymbalic_mcld",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "defaultB": {
+      "def": "defaultB",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "drum_kick": {
+      "def": "drum_kick",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "source",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        }
+      ]
+    },
+    "snare": {
+      "def": "snare",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "sinfreq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 180
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "everythingrhodes": {
+      "def": "everythingrhodes",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "lforate",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 4.85
+        }
+      ]
+    },
+    "fatvelocitybass": {
+      "def": "fatvelocitybass",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 12000
+        }
+      ]
+    },
+    "waveguideFlute": {
+      "def": "waveguideFlute",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "scl",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.2
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "ipress",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 3.6,
+          "curve": "lin",
+          "default": 0.9
+        }
+      ]
+    },
+    "forest_bird_pj": {
+      "def": "forest_bird_pj",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "goeysynth": {
+      "def": "goeysynth",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.1
+        }
+      ]
+    },
+    "handclapsmash": {
+      "def": "handclapsmash",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 12000
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "handclapsmash2": {
+      "def": "handclapsmash2",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 12000
+        },
+        {
+          "name": "cutoff2",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 10000
+        }
+      ]
+    },
+    "harpsichord1": {
+      "def": "harpsichord1",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "jilet": {
+      "def": "jilet",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 4
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "endReflection",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 6.0,
+          "curve": "lin",
+          "default": 1.5
+        }
+      ]
+    },
+    "justwannahavefun": {
+      "def": "justwannahavefun",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "ringTime",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 40.0,
+          "curve": "lin",
+          "default": 10.0
+        }
+      ]
+    },
+    "kik": {
+      "def": "kik",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "basefreq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 50
+        },
+        {
+          "name": "ratio",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 7
+        },
+        {
+          "name": "sweeptime",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.05
+        }
+      ]
+    },
+    "kick3": {
+      "def": "kick3",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "punch",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "kick_chrp": {
+      "def": "kick_chrp",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "kick_oto309": {
+      "def": "kick_oto309",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "kraftySnr": {
+      "def": "kraftySnr",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 2000
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 3
+        }
+      ]
+    },
+    "moogbasstone2": {
+      "def": "moogbasstone2",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "attackTime",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.2
+        }
+      ]
+    },
+    "mrostinato": {
+      "def": "mrostinato",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "lforate",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 10
+        }
+      ]
+    },
+    "oneclap_thor": {
+      "def": "oneclap_thor",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "filterfreq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 1000
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "organdonor": {
+      "def": "organdonor",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "ping_mh": {
+      "def": "ping_mh",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.2
+        },
+        {
+          "name": "dur",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.1
+        }
+      ]
+    },
+    "plastickystrings": {
+      "def": "plastickystrings",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "lforate",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 5900
+        }
+      ]
+    },
+    "plucking": {
+      "def": "plucking",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "decay",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 5
+        }
+      ]
+    },
+    "poly": {
+      "def": "poly",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 400
+        }
+      ]
+    },
+    "prophet5pwmstrings": {
+      "def": "prophet5pwmstrings",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1.0
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.1
+        }
+      ]
+    },
+    "pwmbling": {
+      "def": "pwmbling",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "lforate",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 4.85
+        }
+      ]
+    },
+    "ressquares": {
+      "def": "ressquares",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 8000
+        }
+      ]
+    },
+    "sillyVoice": {
+      "def": "sillyVoice",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 220
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "vibratoSpeed",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 24.0,
+          "curve": "lin",
+          "default": 6
+        }
+      ]
+    },
+    "singleoscillatorwobble": {
+      "def": "singleoscillatorwobble",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1.0
+        },
+        {
+          "name": "lforate",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 10
+        }
+      ]
+    },
+    "situationsynth": {
+      "def": "situationsynth",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 8000
+        }
+      ]
+    },
+    "snare_oto309": {
+      "def": "snare_oto309",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "snare_stein": {
+      "def": "snare_stein",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "solo": {
+      "def": "solo",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 90
+        }
+      ]
+    },
+    "sos_bell": {
+      "def": "sos_bell",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "spacetheremin": {
+      "def": "spacetheremin",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "lforate",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 6
+        }
+      ]
+    },
+    "spookystrings": {
+      "def": "spookystrings",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 8000
+        }
+      ]
+    },
+    "spookystrings2": {
+      "def": "spookystrings2",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 8000
+        }
+      ]
+    },
+    "string": {
+      "def": "string",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 1000
+        }
+      ]
+    },
+    "synchronicity": {
+      "def": "synchronicity",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 8000
+        }
+      ]
+    },
+    "tonewheeltwo": {
+      "def": "tonewheeltwo",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "lforate",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 4.85
+        }
+      ]
+    },
+    "trianglewavebells": {
+      "def": "trianglewavebells",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1.0
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "voicform": {
+      "def": "voicform",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.25
+        },
+        {
+          "name": "voiceGain",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.25
+        }
+      ]
+    },
+    "werkit": {
+      "def": "werkit",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 100
+        }
+      ]
+    },
+    "werkit2": {
+      "def": "werkit2",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 100
+        }
+      ]
+    },
+    "whoorgan": {
+      "def": "whoorgan",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 8000
+        }
+      ]
+    },
+    "winwoodlead": {
+      "def": "winwoodlead",
+      "source": "everythingwillbetakenaway/Synthdefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "cutoff",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 20.0,
+          "max": 12000.0,
+          "curve": "exp",
+          "default": 8000
+        }
+      ]
+    },
+    "dxkBd1": {
+      "def": "dxkBd1",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "basefreq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 45
+        },
+        {
+          "name": "overdrive",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 8.0,
+          "curve": "lin",
+          "default": 2
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkBd2": {
+      "def": "dxkBd2",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "basefreq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 55
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "overdrive",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 8.0,
+          "curve": "lin",
+          "default": 2
+        }
+      ]
+    },
+    "dxkBd3": {
+      "def": "dxkBd3",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 43
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.005
+        },
+        {
+          "name": "ampnoise",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkHh1": {
+      "def": "dxkHh1",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "basefreq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 40
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.001
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.1
+        }
+      ]
+    },
+    "dxkHh2": {
+      "def": "dxkHh2",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "len",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.125
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.001
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.35
+        }
+      ]
+    },
+    "dxkHh3": {
+      "def": "dxkHh3",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "rel",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.2
+        },
+        {
+          "name": "hip1",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 4000.0,
+          "curve": "lin",
+          "default": 1000
+        },
+        {
+          "name": "bp2",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 24000.0,
+          "curve": "lin",
+          "default": 6000
+        }
+      ]
+    },
+    "dxkSd1": {
+      "def": "dxkSd1",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "basefreq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 300
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.125
+        },
+        {
+          "name": "fgprop",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 2.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkSd2": {
+      "def": "dxkSd2",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "basefreq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 180
+        },
+        {
+          "name": "freq1amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0.75
+        },
+        {
+          "name": "freq2amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "dxkSd3": {
+      "def": "dxkSd3",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "basefreq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 150
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.001
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.3
+        }
+      ]
+    },
+    "dxkCymb808": {
+      "def": "dxkCymb808",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "basefreq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 205.35
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.25
+        },
+        {
+          "name": "sustain",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkCymb808_2": {
+      "def": "dxkCymb808_2",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "basefreq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 300
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.25
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkGong1": {
+      "def": "dxkGong1",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 100
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "dr",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkClap1": {
+      "def": "dxkClap1",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "rel",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.3
+        },
+        {
+          "name": "hip1",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 2400.0,
+          "curve": "lin",
+          "default": 600
+        },
+        {
+          "name": "bp1",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 8000.0,
+          "curve": "lin",
+          "default": 2000
+        }
+      ]
+    },
+    "dxkCowbell1": {
+      "def": "dxkCowbell1",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.3
+        },
+        {
+          "name": "basefreq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 540
+        }
+      ]
+    },
+    "dxkArBusSet": {
+      "def": "dxkArBusSet",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "val",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "lag",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.01
+        },
+        {
+          "name": "curve",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        }
+      ]
+    },
+    "dxkCheapPno": {
+      "def": "dxkCheapPno",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "dxkDesyp1": {
+      "def": "dxkDesyp1",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.001
+        },
+        {
+          "name": "dec",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.001
+        }
+      ]
+    },
+    "dxkAcid": {
+      "def": "dxkAcid",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.3
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkRhodes1": {
+      "def": "dxkRhodes1",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "vel",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 3.2,
+          "curve": "lin",
+          "default": 0.8
+        }
+      ]
+    },
+    "dxkSawIter": {
+      "def": "dxkSawIter",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        },
+        {
+          "name": "dec",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0.3
+        }
+      ]
+    },
+    "dxkPortBass": {
+      "def": "dxkPortBass",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        },
+        {
+          "name": "slideTime",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.17
+        }
+      ]
+    },
+    "dxkBpfSaw": {
+      "def": "dxkBpfSaw",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "atk",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 2
+        },
+        {
+          "name": "sus",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 0
+        },
+        {
+          "name": "rel",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 3
+        }
+      ]
+    },
+    "dxkPulseASR": {
+      "def": "dxkPulseASR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkPulseLinen": {
+      "def": "dxkPulseLinen",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkPulseADSR": {
+      "def": "dxkPulseADSR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkPulseTriangle": {
+      "def": "dxkPulseTriangle",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkPulseSine": {
+      "def": "dxkPulseSine",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkSinASR": {
+      "def": "dxkSinASR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "dxkSinLinen": {
+      "def": "dxkSinLinen",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "dxkSinADSR": {
+      "def": "dxkSinADSR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "dxkSinTriangle": {
+      "def": "dxkSinTriangle",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "dxkSinSine": {
+      "def": "dxkSinSine",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "dxkVarSawASR": {
+      "def": "dxkVarSawASR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkVarSawLinen": {
+      "def": "dxkVarSawLinen",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkVarSawADSR": {
+      "def": "dxkVarSawADSR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkVarSawTriangle": {
+      "def": "dxkVarSawTriangle",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkVarSawSine": {
+      "def": "dxkVarSawSine",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "width",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "dxkSawASR": {
+      "def": "dxkSawASR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "dxkSawLinen": {
+      "def": "dxkSawLinen",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "dxkSawADSR": {
+      "def": "dxkSawADSR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "dxkSawTriangle": {
+      "def": "dxkSawTriangle",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "dxkSawSine": {
+      "def": "dxkSawSine",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "len",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        }
+      ]
+    },
+    "dxkSin2ASR": {
+      "def": "dxkSin2ASR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0.01
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkSin2Linen": {
+      "def": "dxkSin2Linen",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0.01
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkSin2ADSR": {
+      "def": "dxkSin2ADSR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0.01
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkSin2Triangle": {
+      "def": "dxkSin2Triangle",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0.01
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkSin2Sine": {
+      "def": "dxkSin2Sine",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "detune",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.1,
+          "max": 20.0,
+          "curve": "exp",
+          "default": 0.01
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkDtmf": {
+      "def": "dxkDtmf",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "number",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0
+        },
+        {
+          "name": "mul",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.001
+        }
+      ]
+    },
+    "dxkClik": {
+      "def": "dxkClik",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "samplen",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 1
+        }
+      ]
+    },
+    "dxkClikFilt": {
+      "def": "dxkClikFilt",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "oneshot",
+      "params": [
+        {
+          "name": "samplen",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.05,
+          "max": 8.0,
+          "curve": "exp",
+          "default": 1
+        },
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
+      ]
+    },
+    "dxkWNoiseBPFADSR": {
+      "def": "dxkWNoiseBPFADSR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.01
+        }
+      ]
+    },
+    "dxkWNoizBPFASR": {
+      "def": "dxkWNoizBPFASR",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "rq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        },
+        {
+          "name": "att",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.001,
+          "max": 2.0,
+          "curve": "exp",
+          "default": 0.001
+        }
+      ]
+    },
+    "dxkSimpleFm": {
+      "def": "dxkSimpleFm",
+      "source": "derekxkwan/dxkSynthDefs",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "modharm",
+          "control": "vSliderButton3",
+          "cc": 85,
+          "min": 0.0,
+          "max": 4.0,
+          "curve": "lin",
+          "default": 1
+        },
+        {
+          "name": "modidx",
+          "control": "vSliderButton0",
+          "cc": 61,
+          "min": 0.0,
+          "max": 2.0,
+          "curve": "lin",
+          "default": 0.5
+        }
+      ]
+    },
+    "acid_oto309": {
+      "def": "acid_oto309",
+      "source": "supercollider-quarks/SynthDefPool",
+      "gesture": "continuous",
+      "params": [
+        {
+          "name": "freq",
+          "control": "vSliderButton1",
+          "cc": 69,
+          "min": 40.0,
+          "max": 4000.0,
+          "curve": "exp",
+          "default": 440
+        },
+        {
+          "name": "amp",
+          "control": "vSliderButton2",
+          "cc": 77,
+          "min": 0.0,
+          "max": 1.0,
+          "curve": "lin",
+          "default": 0.1
+        }
       ]
     }
   }

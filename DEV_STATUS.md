@@ -1,6 +1,6 @@
 # DEV_STATUS — super-quneo-collider
 
-Last updated: 2026-11-23
+Last updated: 2026-11-24
 
 ## Current state
 
@@ -11,7 +11,7 @@ Last updated: 2026-11-23
   MIDI state from the bridge — not just the 3 synth-bound sliders. A pad pressed
   on the real board lights the same pad on the model, in the same orientation
   and brightness, and the state survives a bridge restart.
-- Backend: **140** pytest green. Frontend: **49** browser-harness tests green.
+- Backend: **138** pytest green. Frontend: **49** browser-harness tests green.
 
 ## Corner triggers + doc examples (§9.6/§9.7) — landed 2026-11-23
 
@@ -35,6 +35,55 @@ MIDI into every entry through three onset modes instead of CC-only bubbling.
 - DoD (§7): no preset is flashed and selection never writes to the board; all
   nine defs are delivered at boot in the one-shot `sc.load_defs()` batch
   (numDefs ≥ 9); selection remains control-plane only.
+
+## Community SynthDef imports (§9.8 / §9.9) — landed 2026-11-24
+
+The catalog grew 9 hand-authored entries → 117 (§9.8, the SCLOrkSynths banks) → **208
+shipped defs** (§9.9). `catalog.json` and `sc.py`'s `_DEF_SCRIPTS` are a 1:1 mirror at
+208, and the tests derive their expectations from the catalog rather than a frozen list.
+
+Where the 208 come from (per-entry `source`):
+
+- 193 from the §9.9 community collections — everythingwillbetakenaway/Synthdefs 60,
+  derekxkwan/dxkSynthDefs 53, loopier/synthdefs 37, diegodorado/tidal-synths 28,
+  theseanco/awesome-synthdefs 14, supercollider-quarks/SynthDefPool 1.
+- 7 from §9.8 (SCLOrkSynths percussion bank) and 8 built-in examples
+  (`examples.html` and the original Stage-1 defs).
+- Gesture split: 118 `continuous`, 90 `oneshot`.
+
+Authoring stays mechanical (§9.9.5) in `scripts/reshape_community_synthdefs.py`:
+normalize `arg out=0`, append the canonical stop/fade guard tail, strip upstream
+`metadata:` into a `//` provenance header, read gesture/onset off the graph, and bind
+the first two/three bindable args to the slider ladder in declaration order.
+Modes: `--dry-run`, `--write`, `--check`, `--sample N`, `--prune`.
+
+A def ships only if all three gates hold:
+
+1. sclang compiles the fragment offline.
+2. scsynth accepts it on `/d_recv` — probed on a FRESH scratch server per candidate,
+   because `load_defs()` returns True as soon as `numDefs` reaches the expected count.
+3. At least one bindable param exists (§9.9.5); `test_every_example_binds_at_least_one_parameter`
+   holds that line.
+
+Removed along the way: 68 fragments that do not compile against stock 3.13 classes/UGens,
+`superprimes` (the server refused it: `exception in GraphDef_Recv: exceeded number of
+interconnect buffers`), and `bd` / `closedhat` / `hat` / `sd` (nothing bindable).
+The importer rewrites the deprecated `.asInt` to `.asInteger` at generation time, so a
+def load prints no deprecation warning.
+
+Licences (§9.9.4): `LICENSE.dxkSynthDefs` and `LICENSE.sInstruments` sit beside the
+fragments they cover (both upstreams are GPL-3.0). Sources shipped without a licence keep
+their upstream URL and author in the fragment header; clear those before any public release.
+
+Operational: the bridge snapshots `catalog.json` at startup and has no restart route, so a
+bridge that was already running when `--write` / `--prune` rewrote the files keeps serving
+its boot-time catalog. Restart the bridge after any catalog or def change.
+
+Still open: the def `<select>` lists all 208 in one flat list. Group it into families
+(the §9.9.1 collections) once the list gets hard to scroll.
+
+Backend suite: **138** pytest green (down from 140 — the four def-specific tests for pruned
+defs went away, and the four catalog tests now derive from `catalog.json`).
 
 ## Milestone detail (full-board lit-state mirror)
 
