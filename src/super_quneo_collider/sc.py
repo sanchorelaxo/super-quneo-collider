@@ -39,12 +39,19 @@ _DEF_SCRIPTS = (
     "bubbles.scd",
     "formant.scd",
     "sine.scd",
-    "klang.scd",
     "simpleFM.scd",
     "chainsaw.scd",
     "drummer.scd",
     "gabberkick.scd",
     "hoover.scd",
+    # SCLOrkSynths import (SPEC §9.8), bank by bank.  Percussion first.
+    "abstractDrum.scd",
+    "kalimba.scd",
+    "marimba1.scd",
+    "modalMarimba.scd",
+    "pmCrotales.scd",
+    "steelDrum.scd",
+    "xylophone.scd",
 )
 # The same defs by name, in the same order, for callers that talk about them.
 DEF_NAMES = tuple(Path(name).stem for name in _DEF_SCRIPTS)
@@ -79,8 +86,8 @@ def resolve_sclang() -> str | None:
 def _typed(value):
     """The OSC type for a def argument.
 
-    Integer parameters (klang's ``nPartials``/``nChans``, the ``gate``) must not
-    arrive as floats: SC compares them against integer indices.
+    Integer parameters (``gate``, ``fade``) must not arrive as floats: SC
+    compares them against integer indices.
     """
     return value if isinstance(value, int) else float(value)
 

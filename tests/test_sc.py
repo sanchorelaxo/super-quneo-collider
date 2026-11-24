@@ -34,7 +34,7 @@ def test_def_scripts_cover_every_catalog_example():
     )
     defs = tuple(v["def"] for v in catalog["examples"].values())
     assert DEF_NAMES == tuple(defs)
-    assert len(DEF_NAMES) == 9
+    assert len(DEF_NAMES) == 15
 
 
 def test_resolve_scsynth_exists():
@@ -87,7 +87,7 @@ def test_bubbles_defaults():
 
 
 @scsynth_ok
-def test_formant_and_klang_defaults():
+def test_formant_and_sine_defaults():
     # Each example is its own def with its own defaults; the bridge spawns
     # whichever one the catalog says is active.
     s = ScServer()
@@ -97,9 +97,6 @@ def test_formant_and_klang_defaults():
         s.spawn("formant", 1000)
         assert s.get_param(1000, "fundfreq") == pytest.approx(440.0, abs=1e-2)
         assert s.get_param(1000, "bwfreq") == pytest.approx(100.0, abs=1e-2)
-        s.spawn("klang", 1001, nPartials=32, nChans=8)
-        assert s.get_param(1001, "nPartials") == pytest.approx(32.0, abs=1e-3)
-        assert s.get_param(1001, "nChans") == pytest.approx(8.0, abs=1e-3)
         s.spawn("sine", 1002, freq=880.0)
         assert s.get_param(1002, "freq") == pytest.approx(880.0, abs=1e-2)
     finally:
@@ -211,24 +208,12 @@ def test_load_defs_fails_when_sclang_exits_nonzero():
     assert len(calls) == 1
 
 
-def test_spawn_sends_the_named_def_with_typed_args():
+def test_spawn_sends_the_named_def_with_its_args():
     s = ScServer()
     sent = []
     s._send = lambda *a: sent.append(a)
-    s.spawn("klang", 1000, nPartials=32, nChans=8, freq=440.0)
-    assert sent[0] == (
-        "/s_new",
-        "klang",
-        1000,
-        0,
-        0,
-        "nPartials",
-        32,
-        "nChans",
-        8,
-        "freq",
-        440.0,
-    )
+    s.spawn("sine", 1000, freq=440.0)
+    assert sent[0] == ("/s_new", "sine", 1000, 0, 0, "freq", 440.0)
 
 
 def test_boot_idempotent():

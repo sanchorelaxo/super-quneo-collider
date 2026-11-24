@@ -103,18 +103,24 @@ def test_status_shape():
     assert isinstance(st["note"], dict)
 
 
-def test_status_lists_all_nine_examples():
+def test_status_lists_all_examples():
     st = make_app().status()
     assert [e["id"] for e in st["examples"]] == [
         "bubbles",
         "formant",
         "sine",
-        "klang",
         "simpleFM",
         "chainsaw",
         "drummer",
         "gabberkick",
         "hoover",
+        "abstractDrum",
+        "kalimba",
+        "marimba1",
+        "modalMarimba",
+        "pmCrotales",
+        "steelDrum",
+        "xylophone",
     ]
 
 
@@ -153,8 +159,8 @@ def test_status_helper_is_derived_from_the_catalog():
 
 def test_status_starts_on_the_examples_defaults():
     # Before any CC arrives the parameter state is the catalog's defaults.
-    app = make_app(active="klang")
-    assert app.status()["sliders"] == {"nPartials": 12, "nChans": 5}
+    app = make_app(active="sine")
+    assert app.status()["sliders"] == {"freq": 440}
 
 
 # --- scaling through the active example -----------------------------------
@@ -219,8 +225,6 @@ def test_on_cc_reads_the_channel_14_rotary():
         ("formant", 61, 127, "fundfreq", 10240.0),
         ("formant", 61, 0, "fundfreq", 40.0),
         ("sine", 61, 127, "freq", 2000.0),
-        ("klang", 61, 127, "nPartials", 32),
-        ("klang", 69, 127, "nChans", 8),
     ],
 )
 def test_an_examples_variables_scale_to_the_bound_control(
@@ -234,7 +238,7 @@ def test_an_examples_variables_scale_to_the_bound_control(
 
 @pytest.mark.parametrize(
     "example,param",
-    [("formant", "fundfreq"), ("sine", "freq"), ("klang", "nPartials")],
+    [("formant", "fundfreq"), ("sine", "freq")],
 )
 def test_selecting_an_example_rebinds_loccc_61(example, param):
     # SPEC §6, "selecting an example re-binds the control surface".
@@ -249,21 +253,6 @@ def test_selecting_an_example_rebinds_loccc_61(example, param):
     app.on_cc(61, 127)
     assert param in app.status()["sliders"]
     assert "wobble" not in app.status()["sliders"]
-
-
-def test_klang_spawns_int_params_as_ints():
-    app = make_app(active="klang")
-    app.on_cc(61, 127)
-    app.on_cc(69, 127)
-    # The first control starts the voice with the state as it stands...
-    _def, _node, args = app.sc.spawns[-1]
-    assert args == {"nPartials": 32, "nChans": 5, "fade": 1}
-    # ...the second retunes that same node in one /n_set.
-    node, retune = app.sc.params[-1]
-    assert node == 1000
-    assert retune == {"nPartials": 32, "nChans": 8, "fade": 1}
-    # SC compares nPartials/nChans against integer indices: they must stay ints.
-    assert all(isinstance(v, int) for v in list(args.values()) + list(retune.values()))
 
 
 def test_unknown_example_is_rejected():
@@ -319,7 +308,7 @@ def test_switching_twice_does_not_retune_a_voice_that_is_already_fading():
     app.start()
     app.on_cc(61, 64)
     app.select_example("sine")
-    app.select_example("klang")
+    app.select_example("formant")
     assert app.sc.params == [(1000, {"gate": 0})]
 
 
@@ -440,12 +429,18 @@ def test_api_collider_lists_the_examples():
             "bubbles",
             "formant",
             "sine",
-            "klang",
             "simpleFM",
             "chainsaw",
             "drummer",
             "gabberkick",
             "hoover",
+            "abstractDrum",
+            "kalimba",
+            "marimba1",
+            "modalMarimba",
+            "pmCrotales",
+            "steelDrum",
+            "xylophone",
         ]
         assert payload["activeExample"] == "bubbles"
 
@@ -453,12 +448,12 @@ def test_api_collider_lists_the_examples():
 def test_api_select_switches_the_active_example():
     with running_server() as (port, app):
         status, ctype, body = _request(
-            port, "POST", "/api/collider/example", {"id": "klang"}
+            port, "POST", "/api/collider/example", {"id": "sine"}
         )
         assert status == 200
         assert ctype == "application/json"
-        assert json.loads(body)["activeExample"] == "klang"
-        assert app.active == "klang"
+        assert json.loads(body)["activeExample"] == "sine"
+        assert app.active == "sine"
 
 
 def test_api_select_returns_the_helper_text_for_the_new_example():

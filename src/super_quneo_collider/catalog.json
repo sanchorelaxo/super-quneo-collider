@@ -31,15 +31,6 @@
         {"name": "freq", "control": "vSliderButton0", "cc": 61, "min": 40, "max": 2000, "curve": "exp", "default": 440}
       ]
     },
-    "klang": {
-      "def": "klang",
-      "source": "klang.scd",
-      "gesture": "continuous",
-      "params": [
-        {"name": "nPartials", "control": "vSliderButton0", "cc": 61, "min": 1, "max": 32, "curve": "int", "default": 12},
-        {"name": "nChans",    "control": "vSliderButton1", "cc": 69, "min": 1, "max": 8,  "curve": "int", "default": 5}
-      ]
-    },
     "simpleFM": {
       "def": "simpleFM",
       "source": "examples.html",
@@ -82,6 +73,62 @@
       "onset": "note",
       "params": [
         {"name": "freq", "control": "vSliderButton0", "cc": 61, "min": 40, "max": 2000, "curve": "exp", "default": 440}
+      ]
+    },
+    "abstractDrum": {
+      "def": "abstractDrum",
+      "source": "SCLOrkSynths/percussion",
+      "gesture": "oneshot",
+      "params": [
+        {"name": "decCoef", "control": "vSliderButton3", "cc": 85, "min": 0.01, "max": 1.0, "curve": "lin", "default": 0.15}
+      ]
+    },
+    "kalimba": {
+      "def": "kalimba",
+      "source": "SCLOrkSynths/percussion",
+      "gesture": "oneshot",
+      "params": [
+        {"name": "rel", "control": "vSliderButton3", "cc": 85, "min": 0.5, "max": 8.0, "curve": "exp", "default": 3}
+      ]
+    },
+    "marimba1": {
+      "def": "marimba1",
+      "source": "SCLOrkSynths/percussion",
+      "gesture": "oneshot",
+      "params": [
+        {"name": "rq", "control": "vSliderButton3", "cc": 85, "min": 0.001, "max": 0.5, "curve": "exp", "default": 0.02}
+      ]
+    },
+    "modalMarimba": {
+      "def": "modalMarimba",
+      "source": "SCLOrkSynths/percussion",
+      "gesture": "oneshot",
+      "params": [
+        {"name": "position", "control": "vSliderButton3", "cc": 85, "min": 0.0, "max": 1.0, "curve": "lin", "default": 0.414}
+      ]
+    },
+    "pmCrotales": {
+      "def": "pmCrotales",
+      "source": "SCLOrkSynths/percussion",
+      "gesture": "oneshot",
+      "params": [
+        {"name": "tone", "control": "vSliderButton3", "cc": 85, "min": 0.5, "max": 12.0, "curve": "exp", "default": 3}
+      ]
+    },
+    "steelDrum": {
+      "def": "steelDrum",
+      "source": "SCLOrkSynths/percussion",
+      "gesture": "oneshot",
+      "params": [
+        {"name": "dec", "control": "vSliderButton3", "cc": 85, "min": 0.3, "max": 4.0, "curve": "exp", "default": 1.5}
+      ]
+    },
+    "xylophone": {
+      "def": "xylophone",
+      "source": "SCLOrkSynths/percussion",
+      "gesture": "oneshot",
+      "params": [
+        {"name": "rel", "control": "vSliderButton3", "cc": 85, "min": 0.5, "max": 8.0, "curve": "exp", "default": 2}
       ]
     }
   }

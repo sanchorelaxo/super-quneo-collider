@@ -96,17 +96,23 @@ def test_scale_value_int_rounds_to_whole_counts():
 
 # --- the catalog ---------------------------------------------------------
 
-def test_catalog_lists_all_nine_examples(catalog):
+def test_catalog_lists_all_examples(catalog):
     assert example_ids(catalog) == [
         "bubbles",
         "formant",
         "sine",
-        "klang",
         "simpleFM",
         "chainsaw",
         "drummer",
         "gabberkick",
         "hoover",
+        "abstractDrum",
+        "kalimba",
+        "marimba1",
+        "modalMarimba",
+        "pmCrotales",
+        "steelDrum",
+        "xylophone",
     ]
 
 
@@ -119,9 +125,9 @@ def test_catalog_onset_and_gesture_distinguish_drones_from_one_shots(catalog):
     assert examples["hoover"]["onset"] == "note"
     assert examples["gabberkick"]["gesture"] == "oneshot"
     assert "onset" not in examples["gabberkick"]
-    # ...while the four stage-one examples declare no onset (default: cc),
+    # ...while the three stage-one examples declare no onset (default: cc),
     # and gabberkick (oneshot) also defaults to cc onset.
-    for legacy in ("bubbles", "formant", "sine", "klang"):
+    for legacy in ("bubbles", "formant", "sine"):
         assert "onset" not in examples[legacy]
 
 
@@ -184,8 +190,6 @@ def test_unbound_loccc_produces_nothing(catalog, mapping):
         ("formant", 61, 0, "fundfreq", 40.0),
         ("sine", 61, 127, "freq", 2000.0),
         ("sine", 61, 0, "freq", 40.0),
-        ("klang", 61, 127, "nPartials", 32),
-        ("klang", 69, 127, "nChans", 8),
     ],
 )
 def test_example_variables_scale_to_the_bound_control(
@@ -224,10 +228,6 @@ def test_helper_text_for_formant_matches_the_spec_block(catalog):
 
 
 def test_helper_text_names_the_active_examples_variables(catalog):
-    assert helper_lines(catalog, "klang") == [
-        "vSlider0 -> nPartials  1-32 (int)",
-        "vSlider1 -> nChans     1-8 (int)",
-    ]
     assert helper_lines(catalog, "sine") == ["vSlider0 -> freq  40-2000 Hz (exp)"]
 
 
